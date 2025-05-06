@@ -10,8 +10,11 @@ using namespace std;
 class BookCopy : public Book {
 private:
     int ID;
-    bool isLent;
     tm due_date;
+
+public:
+    BookCopy(string title, string author, string publisher, int published_year, int ID, tm due_date);
+    friend class Library;
 };
 
 #endif 

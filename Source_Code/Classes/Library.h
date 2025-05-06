@@ -15,8 +15,8 @@ private:
 
 public:
     //system
-    void load(const string& filename);
-    void save(const string& filename);
+    void load();
+    void save();
 
     //admin
     void addBook(const Book& book);
