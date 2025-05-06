@@ -3,17 +3,19 @@
 
 #include <string>
 #include <ctime>
-#include "Book.h"
 
 using namespace std;
 
-class BookCopy : public Book {
+class Book; 
+
+class BookCopy {
 private:
     int ID;
     tm due_date;
+    Book* parentBook;
 
 public:
-    BookCopy(string title, string author, string publisher, int published_year, int ID, tm due_date);
+    BookCopy(int ID, tm due_date, Book* parentBook);
     friend class Library;
 };
 

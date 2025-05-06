@@ -5,9 +5,10 @@
 #include <vector>
 #include <string>
 #include <ctime>
-#include "bookCopy.h"
 
 using namespace std;
+
+class BookCopy;
 
 class Book {
 private:
@@ -27,7 +28,7 @@ public:
 
     void lendBook(int ID, tm due_date);
     void returnBook(int ID);
-    void addCopy(int ID, tm due_date);
+    void addCopy(int ID, tm due_date, Book* parentBook);
     
 
     friend class Library;

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "Book.h"
+#include "BookCopy.h"
 
 using namespace std;
 
@@ -13,9 +14,8 @@ Book::Book(string title, string author, string publisher, int published_year, in
     this->lent = lent;
 }
 
-void Book::addCopy(int ID, tm due_date) {
-    BookCopy newCopy(title, author, publisher, published_year, ID, due_date);
-    copies.push_back(newCopy);
+void Book::addCopy(int ID, tm due_date, Book* parentBook) {
+    copies.push_back(BookCopy(ID, due_date, parentBook));
     available++;
     lent--;
 }

@@ -12,6 +12,7 @@ using namespace std;
 class Library {
 private:
     vector<Book> books;
+    vector<Book*> beShown;
 
 public:
     //system
@@ -19,18 +20,23 @@ public:
     void save();
 
     //admin
-    void addBook(const Book& book);
-    void userAddBook();
-    void userRemoveBook();
+    void addBook();
+    void removeCopy();
     
-    //reader
-    void searchByYear();
-    void searchByAuthor();
+    //both
+    
+    void displayBook();
+
     void searchByTitle();
+    void searchByAuthor();
     void searchByPublisher();
+    void searchByYear();
+    void listAllBooks();
+
+    //reader
     void checkOutBook();
     void returnBook();
-    void listAllBooks();
+    
     void exit();
 
 };

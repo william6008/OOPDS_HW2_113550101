@@ -1,6 +1,7 @@
 #include<fstream>
 #include<iostream>
 #include<string>
+#include "../Classes/library.h"
 #include "User.h"
 
 using namespace std;
@@ -32,7 +33,7 @@ bool User::login() {
         correctPassword = "admin"; //admin correct password
     } else {
         ifstream in;
-        in.open("..\\ReaderFile\\" + account + ".txt");
+        in.open("ReaderFile\\" + account + ".txt");
         if (!in) {
             cout << "User not found." << endl;
             return 0;
@@ -73,7 +74,7 @@ bool User::registerUser() {
     cout << "Please set up your username: " << endl;
     cin >> account;
     ifstream in;
-    in.open("..\\ReaderFile\\" + account + ".txt");
+    in.open("ReaderFile\\" + account + ".txt");
     if (in || account == "admin") {
         cout << "Username already exists." << endl;
         return 0;
@@ -85,19 +86,32 @@ bool User::registerUser() {
     cin >> password;
     
     //create account
-    cout << "Account created!" << endl;
     this->account = account;
     this->password = password;
     ofstream out;
-    out.open("File\\" + account + ".txt");
+    out.open("ReaderFile\\" + account + ".txt");
+    if (!out) // Check if the file opened successfully
+    {
+        cout << "Unable to open the file!!!" << endl;
+        return 0;
+    }
+    else  // File opened successfully
+    {
+        /* code */
+    }
+    
+    cout << "Account created!" << endl;
     out << password << endl;
     out.close();
+    this->isAdmin = 0;
     return 1;
 }
 
 void User::adminInterface() {
-    cout << "Admin Interface" << endl;
-    int op;
+    cout << "Welcome to the admin Interface" << endl;
+    Library library;
+    library.load(); 
+    int op = -1;
     while (op != 0) {
         cout << "1. Add Book" << endl;
         cout << "2. Remove Book" << endl;
@@ -106,7 +120,7 @@ void User::adminInterface() {
         cin >> op;
         switch (op) {
             case 1:
-                //addBook();
+                library.addBook();
                 break;
             case 2:
                 //removeBook();
@@ -126,4 +140,44 @@ void User::adminInterface() {
 
 void User::readerInterface() {
     cout << "Welcome to the reader interface!" << endl;
+    int op = -1;
+    while (op != 0) {
+        cout << "1. Search by Year" << endl;
+        cout << "2. Search by Author" << endl;
+        cout << "3. Search by Title" << endl;
+        cout << "4. Search by Publisher" << endl;
+        cout << "5. Check Out Book" << endl;
+        cout << "6. Return Book" << endl;
+        cout << "7. List All Books" << endl;
+        cout << "0. Exit" << endl;
+        cin >> op;
+        switch (op) {
+            case 1:
+                //searchByYear();
+                break;
+            case 2:
+                //searchByAuthor();
+                break;
+            case 3:
+                //searchByTitle();
+                break;
+            case 4:
+                //searchByPublisher();
+                break;
+            case 5:
+                //checkOutBook();
+                break;
+            case 6:
+                //returnBook();
+                break;
+            case 7:
+                //listAllBooks();
+                break;
+            case 0:
+                cout << "Exiting reader interface." << endl;
+                break;
+            default:
+                cout << "Invalid option." << endl;
+        }
+    }
 }
