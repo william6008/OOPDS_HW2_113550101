@@ -6,6 +6,7 @@
 #include <ctime>
 #include "Book.h"
 #include "BookCopy.h"
+#include "../UserSystem/User.h"
 
 using namespace std;
 
@@ -13,11 +14,11 @@ class Library {
 private:
     vector<Book> books;
     vector<Book*> beShown;
-    bool isAdmin;
+    User user;
 
 public:
     //constructor
-    Library(bool isAdmin);
+    Library(User user);
 
     //system
     void load();

@@ -10,7 +10,7 @@
 using namespace std;
 
 //constructor
-Library::Library(bool isAdmin): isAdmin(isAdmin){}
+Library::Library(User user): user(user) {};
 
 
 //system
@@ -142,7 +142,7 @@ void Library::bookDetails(int No) {
     cout << "Lent:" << beShown[No]->lent << endl;
     cout << endl;
 
-    if (isAdmin) {
+    if (user.getIsAdmin()) {
         cout << "1. Add copies" << endl;
         cout << "2. Remove copies" << endl;
         cout << "3. Go back" << endl;
