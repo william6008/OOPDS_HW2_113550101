@@ -1,7 +1,9 @@
 #include<fstream>
 #include<iostream>
 #include<string>
-#include "../Classes/library.h"
+#include<set>
+#include "../Classes/Library.h"
+#include "../Classes/InputSystem.h"
 #include "User.h"
 
 using namespace std;
@@ -90,15 +92,11 @@ bool User::registerUser() {
     this->password = password;
     ofstream out;
     out.open("ReaderFile\\" + account + ".txt");
-    if (!out) // Check if the file opened successfully
-    {
+    if (!out) {
         cout << "Unable to open the file!!!" << endl;
         return 0;
     }
-    else  // File opened successfully
-    {
-        /* code */
-    }
+
     
     cout << "Account created!" << endl;
     out << password << endl;
@@ -107,77 +105,5 @@ bool User::registerUser() {
     return 1;
 }
 
-void User::adminInterface() {
-    cout << "Welcome to the admin Interface" << endl;
-    Library library;
-    library.load(); 
-    int op = -1;
-    while (op != 0) {
-        cout << "1. Add Book" << endl;
-        cout << "2. Remove Book" << endl;
-        cout << "3. List All Books" << endl;
-        cout << "0. Exit" << endl;
-        cin >> op;
-        switch (op) {
-            case 1:
-                library.addBook();
-                break;
-            case 2:
-                //removeBook();
-                break;
-            case 3:
-                //listAllBooks();
-                break;
-            case 0:
-                cout << "Exiting admin interface." << endl;
-                break;
-            default:
-                cout << "Invalid option." << endl;
-        }
-    }
 
-}
 
-void User::readerInterface() {
-    cout << "Welcome to the reader interface!" << endl;
-    int op = -1;
-    while (op != 0) {
-        cout << "1. Search by Year" << endl;
-        cout << "2. Search by Author" << endl;
-        cout << "3. Search by Title" << endl;
-        cout << "4. Search by Publisher" << endl;
-        cout << "5. Check Out Book" << endl;
-        cout << "6. Return Book" << endl;
-        cout << "7. List All Books" << endl;
-        cout << "0. Exit" << endl;
-        cin >> op;
-        switch (op) {
-            case 1:
-                //searchByYear();
-                break;
-            case 2:
-                //searchByAuthor();
-                break;
-            case 3:
-                //searchByTitle();
-                break;
-            case 4:
-                //searchByPublisher();
-                break;
-            case 5:
-                //checkOutBook();
-                break;
-            case 6:
-                //returnBook();
-                break;
-            case 7:
-                //listAllBooks();
-                break;
-            case 0:
-                cout << "Exiting reader interface." << endl;
-                break;
-            default:
-                cout << "Invalid option." << endl;
-        }
-    }
-}

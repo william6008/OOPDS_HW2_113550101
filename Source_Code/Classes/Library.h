@@ -13,8 +13,12 @@ class Library {
 private:
     vector<Book> books;
     vector<Book*> beShown;
+    bool isAdmin;
 
 public:
+    //constructor
+    Library(bool isAdmin);
+
     //system
     void load();
     void save();
@@ -26,6 +30,9 @@ public:
     //both
     
     void displayBook();
+
+    void bookDetails(int No);
+
 
     void searchByTitle();
     void searchByAuthor();

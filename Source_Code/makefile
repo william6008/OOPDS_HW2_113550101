@@ -1,32 +1,22 @@
-# 編譯器與預設選項
 CXX = g++
+CXXFLAGS = -std=c++17 -Wall
+TARGET = main
 
-# 一般與 Debug 模式的 flags
-CXXFLAGS = -std=c++17 -Wall -IClasses -IUserSystem
-DEBUGFLAGS = -g
-
-# 檔案列表
 SRCS = main.cpp \
-       Classes/Book.cpp \
-       Classes/BookCopy.cpp \
-       Classes/Library.cpp \
-       UserSystem/User.cpp
+       BookSystem.cpp \
+       Library.cpp \
+       InputSystem.cpp \
+       UserSystem.cpp \
+       Admin.cpp \
+       Reader.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
-# 預設目標
-TARGET = library_app
-
-all: $(TARGET)
-
-# Release 模式（無 -g）
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Debug 模式（使用 -g）
-debug: CXXFLAGS += $(DEBUGFLAGS)
-debug: clean $(TARGET)
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $<
 
-# 清除所有中間檔
 clean:
 	rm -f $(OBJS) $(TARGET)

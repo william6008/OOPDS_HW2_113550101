@@ -1,9 +1,17 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "library.h"
+#include <vector>
+#include <ctime>
+#include "Library.h"
+#include "Book.h"
+#include "BookCopy.h"
 
 using namespace std;
+
+//constructor
+Library::Library(bool isAdmin): isAdmin(isAdmin){}
+
 
 //system
 void Library::load() {
@@ -74,66 +82,103 @@ void Library::save() {
 
 //both
 
-void showSpace(string& str) {
+void showSpace(int allowLenth, string& str) {
     int len = str.length();
     string copy;
 
-    if (len > 14) {
-        copy = str.substr(0, 11) + "...";
-        len = 14;
+    if (len > allowLenth) {
+        copy = str.substr(0, allowLenth - 3) + "...";
+        len = allowLenth;
     } else {
         copy = str;
     }
 
-    for (int i = 0; i < (16 - len) / 2; i++) {
+    for (int i = 0; i < (allowLenth + 2 - len) / 2; i++) {
         cout << " ";
     }
 
     cout << copy;
 
-    for (int i = 0; i < (16 - len) / 2 + (len % 2); i++) {
+    for (int i = 0; i < (allowLenth + 2 - len) / 2 + (len % 2); i++) {
         cout << " ";
     }
 }
 
 void Library::displayBook() {
-    cout << "" << endl;
-    cout << "--------------------------------------------------------------------------------" << endl;
-    
-    // 顯示每本書的資訊
-    int i = 0;  // 用來顯示書本的編號
-    for (auto it = beShown.begin(); it != beShown.end(); it++, i++) {
-        // 顯示書本編號
-        showSpace(to_string(i));
+   
+    cout << "|  ID  |        Title        |       Author       |" << endl;
+    cout << "---------------------------------------------------" << endl;
+    for (int i = 0; i < sizeof(beShown); i++) {
+        showSpace(6, to_string(i));
         
-        // 顯示書本名稱
-        showSpace((*it)->getName());
+        showSpace(21, beShown[i]->title);
 
-        // 顯示書本分類
-        showSpace((*it)->getCategory());
-
-        // 顯示到期時間（如果有的話）
-        if ((*it)->getDueTime().tm_year != -1) {
-            string dueDate = to_string((*it)->getDueTime().tm_year + 1900) + "/" + 
-                             to_string((*it)->getDueTime().tm_mon + 1) + "/" + 
-                             to_string((*it)->getDueTime().tm_mday);
-            showSpace(dueDate);
-        } else {
-            showSpace("-");
-        }
-
-        // 顯示是否完成
-        if ((*it)->getCompleted()) {
-            showSpace("Yes");
-        } else {
-            showSpace("No");
-        }
-
+        showSpace(20, beShown[i]->author);
         cout << endl;
     }
 
-    cout << "--------------------------------------------------------------------------------" << endl;
+    cout << "---------------------------------------------------" << endl;
+
+    cout << "Choose a book number to proceed." << endl;
+    cout << "Enter 0 to go back." << endl;
+
+    int choice;
+    cin >> choice;
+    if (choice == 0) {
+        return;
+    } else if (choice > 0 && choice <= beShown.size()) {
+        bookDetails(choice - 1);
+    } else {
+        cout << "Invalid choice. Please try again." << endl;
+    } 
 }
+
+void Library::bookDetails(int No) {
+    cout << "Title: " << beShown[No]->title << endl;
+    cout << "Author: " << beShown[No]->author << endl;
+    cout << "Publisher: " << beShown[No]->publisher << endl;
+    cout << "Published Year: " << beShown[No]->published_year << endl;
+    cout << "Available: " << beShown[No]->available << endl;
+    cout << "Lent:" << beShown[No]->lent << endl;
+    cout << endl;
+
+    if (isAdmin) {
+        cout << "1. Add copies" << endl;
+        cout << "2. Remove copies" << endl;
+        cout << "3. Go back" << endl;
+        string choice;
+        while (cin >> choice) {
+            if (choice == "1") {
+                addBook();
+                break;
+            } else if (choice == "2") {
+                removeCopy();
+                break;
+            } else if (choice == "3") {
+                break;
+            } else {
+                cout << "Invalid choice. Please try again." << endl;
+            }
+        }
+    } else {
+        cout << "1. Check out" << endl;
+        cout << "2. Go back" << endl;
+        string choice;
+        while (cin >> choice) {
+            if (choice == "1") {
+                checkOutBook();
+                break;
+            } else if (choice == "2") {
+                break;
+            } else {
+                cout << "Invalid choice. Please try again." << endl;
+            }
+        }
+    }
+    
+}
+
+
 
 
 

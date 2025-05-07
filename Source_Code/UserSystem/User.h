@@ -5,7 +5,7 @@
 using namespace std;
 
 class User {
-private:
+protected:
     bool isAdmin; 
     string account;
     string password;
@@ -18,8 +18,7 @@ public:
     bool login();
     bool registerUser();
 
-    void adminInterface();
-    void readerInterface();
+    virtual void interface();
 };
 
 #endif
