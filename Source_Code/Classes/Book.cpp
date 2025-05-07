@@ -5,17 +5,20 @@
 
 using namespace std;
 
-Book::Book(string title, string author, string publisher, int published_year, int available, int lent) {
+Book::Book(int index, string title, string author, string publisher, int published_year, int available, int lent, int popularity) {
+    this->index = index;
     this->title = title;
     this->author = author;
     this->publisher = publisher;
     this->published_year = published_year;
     this->available = available;
     this->lent = lent;
+    this->popularity = popularity;
 }
 
-void Book::addCopy(int ID, tm due_date, Book* parentBook) {
-    copies.push_back(BookCopy(ID, due_date, parentBook));
-    available++;
-    lent--;
+void Book::addCopy(int ID, tm due_date, int parentBookIndex) {
+    copies.push_back(BookCopy(ID, due_date, parentBookIndex));
+    available--;
+    lent++;
 }
+

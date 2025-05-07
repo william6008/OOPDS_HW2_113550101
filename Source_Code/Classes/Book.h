@@ -15,6 +15,8 @@ private:
     vector<BookCopy> copies;
     int available;
     int lent;
+    int index;
+    int popularity;
 
 protected:
     string title;
@@ -24,11 +26,17 @@ protected:
     
 
 public:
-    Book(string title, string author, string publisher, int published_year, int available, int lent);
+    Book(int index
+        , string title
+        , string author
+        , string publisher
+        , int published_year
+        , int available
+        , int lent
+        , int popularity
+    );
 
-    void lendBook(int ID, tm due_date);
-    void returnBook(int ID);
-    void addCopy(int ID, tm due_date, Book* parentBook);
+    void addCopy(int ID, tm due_date, int parentBookIndex);;
     
 
     friend class Library;

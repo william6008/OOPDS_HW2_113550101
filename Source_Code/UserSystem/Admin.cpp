@@ -6,10 +6,15 @@
 #include "../Classes/Library.h"
 #include "../Classes/InputSystem.h"
 
+Admin::Admin(User& user) {
+    this->account = user.getAccount();
+    this->password = user.getPassword();
+    this->isAdmin = 1;
+}
 
-void User::interface() {
+void Admin::interface() {
     cout << "Welcome to the admin Interface" << endl;
-    Library library(1);
+    Library library(*this);
     library.load(); 
     string op;
     while (op != "exit") {

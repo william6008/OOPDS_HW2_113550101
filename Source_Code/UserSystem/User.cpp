@@ -8,6 +8,8 @@
 
 using namespace std;
 
+void User::interface() {}
+
 string User::getAccount() {
     return this->account;
 }

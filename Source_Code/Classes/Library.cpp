@@ -22,15 +22,18 @@ void Library::load() {
         throw "Unable to open the file!!!";
     }
 
+    int index;
     string title;
     string author;
     string publisher;
     int published_year;
     int available;
     int lent;
+    int popularity;
 
 
-    for (int i = 0; getline(in, title, '|'); i++) {
+    for (int i = 0; in >> index; i++) {
+        getline(in, title, '|');
         getline(in, author, '|');
         getline(in, publisher, '|');
         in >> published_year;
@@ -38,11 +41,14 @@ void Library::load() {
         in >> available;
         in.ignore(1, '|');
         in >> lent;
+        in.ignore(1, '|');
+        in >> popularity;
         in.ignore(1, '\n');
-        books.push_back(Book(title, author, publisher, published_year, available, lent));
+
+        books.push_back(Book(index, title, author, publisher, published_year, available, lent, popularity));
         for (int j = 0; j < lent; j++) {
             int ID;
-            tm due_date = { 0 };
+            tm due_date = {};
             in >> ID;
             in.ignore(1, '|');
             in >> due_date.tm_year;
@@ -51,7 +57,7 @@ void Library::load() {
             in.ignore(1, '|');
             in >> due_date.tm_mday;
             in.ignore(1, '\n');
-            books.back().addCopy(ID, due_date, &books.back());
+            books.back().addCopy(ID, due_date, index);
         }
 
 
@@ -69,7 +75,10 @@ void Library::save() {
     }
 
     for (auto& it : books) {
-        out << it.title << "|" << it.author << "|" << it.publisher << "|" << it.published_year << "|" << it.available << "|" << it.lent;
+        out << it.index << "|" << it.title 
+        << "|" << it.author << "|" << it.publisher 
+        << "|" << it.published_year << "|" << it.available 
+        << "|" << it.lent << "|" << it.popularity;
         out << endl;
         for (auto& it2 : it.copies) {
             out << it2.ID << "|" << it2.due_date.tm_year << "|" << it2.due_date.tm_mon << "|" << it2.due_date.tm_mday;
@@ -82,7 +91,7 @@ void Library::save() {
 
 //both
 
-void showSpace(int allowLenth, string& str) {
+void showSpace(int allowLenth, string str) {
     int len = str.length();
     string copy;
 
@@ -108,7 +117,7 @@ void Library::displayBook() {
    
     cout << "|  ID  |        Title        |       Author       |" << endl;
     cout << "---------------------------------------------------" << endl;
-    for (int i = 0; i < sizeof(beShown); i++) {
+    for (int i = 0; i < int(sizeof(beShown)); i++) {
         showSpace(6, to_string(i));
         
         showSpace(21, beShown[i]->title);
@@ -126,7 +135,7 @@ void Library::displayBook() {
     cin >> choice;
     if (choice == 0) {
         return;
-    } else if (choice > 0 && choice <= beShown.size()) {
+    } else if (choice > 0 && choice <= int(beShown.size())) {
         bookDetails(choice - 1);
     } else {
         cout << "Invalid choice. Please try again." << endl;
@@ -178,6 +187,10 @@ void Library::bookDetails(int No) {
     
 }
 
+void Library::listAllBooks() {
+
+}
+
 
 
 
@@ -218,10 +231,23 @@ void Library::addBook() {
     cout << "Please enter the quantity of the book's copy: " << endl;
     cin >> quantity;
 
-    books.push_back(Book(title, author, publisher, published_year, quantity, 0));
+    books.push_back(Book(sizeof(books), title, author, publisher, published_year, quantity, 0, 0));
     save();
+    cout << "Book added successfully!" << endl;
 }
 
+void Library::removeCopy() {
+
+}
+//reader
+
+void Library::checkOutBook() {
+
+}
+
+void Library::returnBook() {
+
+}
 
 
 

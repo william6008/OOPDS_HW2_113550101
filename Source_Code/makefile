@@ -1,22 +1,28 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall
-TARGET = main
+CXXFLAGS = -std=c++17 -Wall -Wextra -g -IClasses -IUserSystem
+LDFLAGS =
 
-SRCS = main.cpp \
-       BookSystem.cpp \
-       Library.cpp \
-       InputSystem.cpp \
-       UserSystem.cpp \
-       Admin.cpp \
-       Reader.cpp
+SRC = \
+    Classes/Book.cpp \
+    Classes/BookCopy.cpp \
+    Classes/InputSystem.cpp \
+    Classes/Library.cpp \
+    UserSystem/Admin.cpp \
+    UserSystem/Reader.cpp \
+    UserSystem/User.cpp \
+    main.cpp
 
-OBJS = $(SRCS:.cpp=.o)
+OBJ = $(SRC:.cpp=.o)
 
-$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+TARGET = library_app.exe
+
+all: $(TARGET)
+
+$(TARGET): $(OBJ)
+	$(CXX) $(CXXFLAGS) $(OBJ) -o $@ $(LDFLAGS)
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJ) $(TARGET)
