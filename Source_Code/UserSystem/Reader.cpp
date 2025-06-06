@@ -17,6 +17,10 @@ Reader::Reader(User& user) {
     this->isAdmin = 0;
 }
 
+int Reader::getCheckedOutCount() {
+    return this->checkedOutCount;
+}
+
 void Reader::interface() {
     cout << "Welcome to the reader interface!" << endl;
     Library library(*this);

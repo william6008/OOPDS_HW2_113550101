@@ -22,6 +22,21 @@ bool User::getIsAdmin() {
     return this->isAdmin;
 }
 
+int User::getCheckedOutCount() {
+    ifstream in;
+    in.open("ReaderFile\\" + this->account + ".txt");
+    if (!in) {
+        cout << "User not found." << endl;
+        return 0;
+    }
+    
+    int count = 0;
+    in >> count; //read the number of checked out books
+    in.close();
+    return count;
+}
+
+
 
 
 bool User::login() {

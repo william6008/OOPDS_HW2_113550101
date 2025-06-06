@@ -9,8 +9,11 @@
 
 using namespace std;
 
+const int BROW_PERIOD = 30; // days
+const int MAX_BORROWED_BOOKS = 5; // max number of books a user can borrow
+
 //constructor
-Library::Library(User user): user(user) {};
+Library::Library(User& user): user(user) {};
 
 
 //system
@@ -57,7 +60,7 @@ void Library::load() {
             in.ignore(1, '|');
             in >> due_date.tm_mday;
             in.ignore(1, '\n');
-            books.back().addCopy(ID, due_date, index);
+            books.back().copies.push_back(BookCopy(ID, due_date, index));
         }
 
 
@@ -117,7 +120,7 @@ void Library::displayBook() {
    
     cout << "|  ID  |        Title        |       Author       |" << endl;
     cout << "---------------------------------------------------" << endl;
-    for (int i = 0; i < int(sizeof(beShown)); i++) {
+    for (int i = 0; i < int(beShown.size()); i++) {
         showSpace(6, to_string(i));
         
         showSpace(21, beShown[i]->title);
@@ -175,7 +178,7 @@ void Library::bookDetails(int No) {
         string choice;
         while (cin >> choice) {
             if (choice == "1") {
-                checkOutBook();
+                checkOutBook(beShown[No]->index);
                 break;
             } else if (choice == "2") {
                 break;
@@ -188,7 +191,10 @@ void Library::bookDetails(int No) {
 }
 
 void Library::listAllBooks() {
-
+    beShown.clear();
+    for (auto& book : books) {
+        beShown.push_back(&book);
+    }
 }
 
 
@@ -241,9 +247,43 @@ void Library::removeCopy() {
 }
 //reader
 
-void Library::checkOutBook() {
+/*BookCopy* Library::checkOutBook(int No) {
+    BookCopy* copy = nullptr;
 
-}
+    if (beShown[No]->available == 0) {
+        cout << "No available copies." << endl;
+        tm availableTime = {};
+        availableTime.tm_year = 2000;
+        availableTime.tm_mon = 1;
+        availableTime.tm_mday = 1;
+        for (auto it : beShown[No]->copies) {
+            if (mktime(&it.due_date) < mktime(&availableTime)) {
+                availableTime = it.due_date;
+                break;
+            }
+        }
+        cout << "The earliest available copy is due on: " << availableTime.tm_year + 1900 << "-" << availableTime.tm_mon + 1 << "-" << availableTime.tm_mday << endl;
+        return nullptr;
+    } else if (user.getCheckedOutCount() >= MAX_BORROWED_BOOKS) {
+        cout << "You have reached the maximum number of borrowed books." << endl;
+        return nullptr;
+    } else {
+        cout << "You have checked out the book successfully!" << endl;
+        beShown[No]->available--;
+        beShown[No]->lent++;
+        beShown[No]->popularity++;
+        BookCopy newCopy(beShown[No]->copies.size(), {}, No);
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        newCopy.due_date.tm_year = ltm->tm_year + 1900;
+        newCopy.due_date.tm_mon = ltm->tm_mon + 1;
+        newCopy.due_date.tm_mday = ltm->tm_mday + 30;
+        mktime(&newCopy.due_date);
+        beShown[No]->copies.push_back(newCopy);
+        copy = &beShown[No]->copies.back();
+    }
+    return copy;
+}*/
 
 void Library::returnBook() {
 

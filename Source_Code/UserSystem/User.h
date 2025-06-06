@@ -13,6 +13,7 @@ protected:
 public:
     string getAccount();
     string getPassword();
+    int getCheckedOutCount();
     bool getIsAdmin();
     
     bool login();

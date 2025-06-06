@@ -18,7 +18,7 @@ private:
 
 public:
     //constructor
-    Library(User user);
+    Library(User& user);
 
     //system
     void load();
@@ -42,7 +42,7 @@ public:
     void listAllBooks();
 
     //reader
-    void checkOutBook();
+    BookCopy* checkOutBook(int No);
     void returnBook();
     void showOverdueBooks();
     

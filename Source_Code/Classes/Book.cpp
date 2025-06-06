@@ -16,9 +16,4 @@ Book::Book(int index, string title, string author, string publisher, int publish
     this->popularity = popularity;
 }
 
-void Book::addCopy(int ID, tm due_date, int parentBookIndex) {
-    copies.push_back(BookCopy(ID, due_date, parentBookIndex));
-    available--;
-    lent++;
-}
 

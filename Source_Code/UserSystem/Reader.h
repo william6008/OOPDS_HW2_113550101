@@ -16,6 +16,7 @@ private:
 
 public:
     Reader(User& user);
+    int getCheckedOutCount();
     void interface() override;
     void load();
     void save();

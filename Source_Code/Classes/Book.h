@@ -36,7 +36,7 @@ public:
         , int popularity
     );
 
-    void addCopy(int ID, tm due_date, int parentBookIndex);;
+
     
 
     friend class Library;
