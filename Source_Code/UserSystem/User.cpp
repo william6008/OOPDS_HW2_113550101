@@ -1,14 +1,12 @@
 #include<fstream>
 #include<iostream>
 #include<string>
-#include<set>
-#include "../Classes/Library.h"
-#include "../Classes/InputSystem.h"
 #include "User.h"
+#include "../Helper/Helper.h"
 
 using namespace std;
 
-void User::interface() {}
+
 
 string User::getAccount() {
     return this->account;
@@ -18,24 +16,13 @@ string User::getPassword() {
     return this->password;
 }
 
+int User::getPunishment() {
+    return this->punishment;
+}
+
 bool User::getIsAdmin() {
     return this->isAdmin;
 }
-
-int User::getCheckedOutCount() {
-    ifstream in;
-    in.open("ReaderFile\\" + this->account + ".txt");
-    if (!in) {
-        cout << "User not found." << endl;
-        return 0;
-    }
-    
-    int count = 0;
-    in >> count; //read the number of checked out books
-    in.close();
-    return count;
-}
-
 
 
 
@@ -45,7 +32,7 @@ bool User::login() {
     string correctPassword;
 
     //user enters account
-    cout << "Please enter your username: " << endl;
+    type("Please enter your username: \n", 1);
     cin >> account;
     
     if (account == "admin") {
@@ -54,7 +41,7 @@ bool User::login() {
         ifstream in;
         in.open("ReaderFile\\" + account + ".txt");
         if (!in) {
-            cout << "User not found." << endl;
+            type("User not found.\n", 1);
             return 0;
         }
     
@@ -65,7 +52,7 @@ bool User::login() {
 
     //user enters password
     string password;
-    cout << "Please enter your password: " << endl;
+    type("Please enter your password: \n", 1);
     cin >> password;
     
     if (password == correctPassword) {
@@ -75,14 +62,18 @@ bool User::login() {
             isAdmin = 1;
             return 1;
         } else {
-            cout << "Login successful!" << endl;
-            cout << "Welcome back, " << account << "!" << endl;
+            type("Login successful!\n", 1);
+            type("Welcome back, " + account + "!\n", 1);
             isAdmin = 0;
+            ifstream in;
+            in.open("ReaderFile\\" + account + ".txt");
+            in.ignore(1000, '\n'); 
+            in >> punishment; 
             return 1;
         }
     }
     else {
-        cout << "Incorrect password." << endl;
+        type("Incorrect password.\n", 1);
         return 0;
     }
 }
@@ -90,18 +81,18 @@ bool User::login() {
 bool User::registerUser() {
     //user enters account
     string account;
-    cout << "Please set up your username: " << endl;
+    type("Please set up your username: \n", 1);
     cin >> account;
     ifstream in;
     in.open("ReaderFile\\" + account + ".txt");
     if (in || account == "admin") {
-        cout << "Username already exists." << endl;
+        type("Username already exists.\n", 1);
         return 0;
     }
     
     //user enters password
     string password;
-    cout << "Please set up your password: " << endl;
+    type("Please set up your password: \n", 1);
     cin >> password;
     
     //create account
@@ -110,13 +101,16 @@ bool User::registerUser() {
     ofstream out;
     out.open("ReaderFile\\" + account + ".txt");
     if (!out) {
-        cout << "Unable to open the file!!!" << endl;
+        type("Unable to open the file!!!\n", 1);
         return 0;
     }
+    else {
 
+    }
     
-    cout << "Account created!" << endl;
+    type("Account created!\n", 1);
     out << password << endl;
+    out << 0 << endl; 
     out.close();
     this->isAdmin = 0;
     return 1;

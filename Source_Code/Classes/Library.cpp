@@ -1,42 +1,45 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
-#include <ctime>
-#include "Library.h"
+#include <thread>
+#include "library.h"
 #include "Book.h"
 #include "BookCopy.h"
+#include "../UserSystem/User.h"
+#include "../DataStructure/HashTable.h"
+#include "../Helper/Helper.h"
 
 using namespace std;
 
-const int BROW_PERIOD = 30; // days
-const int MAX_BORROWED_BOOKS = 5; // max number of books a user can borrow
-
 //constructor
-Library::Library(User& user): user(user) {};
-
+Library::Library(User& user) : titleSearch(1009)
+                                , authorSearch(1009)   
+                                , publisherSearch(1009)
+                                , yearSearch(1009)
+                                , user(user) {
+    load();
+    lastsearch = nullptr;
+}
 
 //system
 void Library::load() {
     ifstream in;
     in.open("MyLibrary\\MyLibrary.txt");
     if (!in) {
-        cout << "Unable to open the file!!!" << endl;
+        type("Unable to open the file!!!\n", 1);
         throw "Unable to open the file!!!";
     }
 
-    int index;
     string title;
     string author;
     string publisher;
     int published_year;
     int available;
     int lent;
-    int popularity;
 
+    books.clear();
 
-    for (int i = 0; in >> index; i++) {
-        getline(in, title, '|');
+    for (int i = 0; getline(in, title, '|'); i++) {
         getline(in, author, '|');
         getline(in, publisher, '|');
         in >> published_year;
@@ -44,14 +47,16 @@ void Library::load() {
         in >> available;
         in.ignore(1, '|');
         in >> lent;
-        in.ignore(1, '|');
-        in >> popularity;
         in.ignore(1, '\n');
-
-        books.push_back(Book(index, title, author, publisher, published_year, available, lent, popularity));
+        books.push_back(new Book(title, author, publisher, published_year, available, lent));
+        titleSearch.insert(books.back(), books.back()->getTitle());
+        authorSearch.insert(books.back(), books.back()->getAuthor());
+        publisherSearch.insert(books.back(), books.back()->getPublisher());
+        yearSearch.insert(books.back(), to_string(books.back()->getPublishedYear()));
         for (int j = 0; j < lent; j++) {
+            string reader;
             int ID;
-            tm due_date = {};
+            tm due_date = { 0 };
             in >> ID;
             in.ignore(1, '|');
             in >> due_date.tm_year;
@@ -59,8 +64,11 @@ void Library::load() {
             in >> due_date.tm_mon;
             in.ignore(1, '|');
             in >> due_date.tm_mday;
+            in.ignore(1, '|');
+            in >> reader;
             in.ignore(1, '\n');
-            books.back().copies.push_back(BookCopy(ID, due_date, index));
+            books.back()->addCopy(ID, due_date, books.back(), reader);
+            if (reader == user.account) user.mybooks.push_back(&books.back()->copies.back());
         }
 
 
@@ -73,18 +81,16 @@ void Library::save() {
     ofstream out;
     out.open("MyLibrary\\MyLibrary.txt", ios::trunc);
     if (!out) {
-        cout << "Unable to open the file!!!" << endl;
+        type("Unable to open the file!!!\n", 1);
         throw "Unable to open the file!!!";
     }
 
     for (auto& it : books) {
-        out << it.index << "|" << it.title 
-        << "|" << it.author << "|" << it.publisher 
-        << "|" << it.published_year << "|" << it.available 
-        << "|" << it.lent << "|" << it.popularity;
+        out << it->title << "|" << it->author << "|" << it->publisher << "|" << it->published_year << "|" << it->available << "|" << it->lent;
         out << endl;
-        for (auto& it2 : it.copies) {
-            out << it2.ID << "|" << it2.due_date.tm_year << "|" << it2.due_date.tm_mon << "|" << it2.due_date.tm_mday;
+        for (auto& it2 : it->copies) {
+            out << it2.ID << "|" << it2.due_date.tm_year << "|" 
+            << it2.due_date.tm_mon << "|" << it2.due_date.tm_mday << "|" << it2.reader;
             out << endl;
         }
     }
@@ -94,131 +100,118 @@ void Library::save() {
 
 //both
 
-void showSpace(int allowLenth, string str) {
-    int len = str.length();
-    string copy;
-
-    if (len > allowLenth) {
-        copy = str.substr(0, allowLenth - 3) + "...";
-        len = allowLenth;
-    } else {
-        copy = str;
-    }
-
-    for (int i = 0; i < (allowLenth + 2 - len) / 2; i++) {
-        cout << " ";
-    }
-
-    cout << copy;
-
-    for (int i = 0; i < (allowLenth + 2 - len) / 2 + (len % 2); i++) {
-        cout << " ";
-    }
-}
-
 void Library::displayBook() {
-   
-    cout << "|  ID  |        Title        |       Author       |" << endl;
-    cout << "---------------------------------------------------" << endl;
-    for (int i = 0; i < int(beShown.size()); i++) {
-        showSpace(6, to_string(i));
-        
-        showSpace(21, beShown[i]->title);
-
-        showSpace(20, beShown[i]->author);
-        cout << endl;
-    }
-
-    cout << "---------------------------------------------------" << endl;
-
-    cout << "Choose a book number to proceed." << endl;
-    cout << "Enter 0 to go back." << endl;
-
-    int choice;
-    cin >> choice;
-    if (choice == 0) {
-        return;
-    } else if (choice > 0 && choice <= int(beShown.size())) {
-        bookDetails(choice - 1);
-    } else {
-        cout << "Invalid choice. Please try again." << endl;
-    } 
-}
-
-void Library::bookDetails(int No) {
-    cout << "Title: " << beShown[No]->title << endl;
-    cout << "Author: " << beShown[No]->author << endl;
-    cout << "Publisher: " << beShown[No]->publisher << endl;
-    cout << "Published Year: " << beShown[No]->published_year << endl;
-    cout << "Available: " << beShown[No]->available << endl;
-    cout << "Lent:" << beShown[No]->lent << endl;
-    cout << endl;
-
-    if (user.getIsAdmin()) {
-        cout << "1. Add copies" << endl;
-        cout << "2. Remove copies" << endl;
-        cout << "3. Go back" << endl;
-        string choice;
-        while (cin >> choice) {
-            if (choice == "1") {
-                addBook();
-                break;
-            } else if (choice == "2") {
-                removeCopy();
-                break;
-            } else if (choice == "3") {
-                break;
-            } else {
-                cout << "Invalid choice. Please try again." << endl;
-            }
-        }
-    } else {
-        cout << "1. Check out" << endl;
-        cout << "2. Go back" << endl;
-        string choice;
-        while (cin >> choice) {
-            if (choice == "1") {
-                checkOutBook(beShown[No]->index);
-                break;
-            } else if (choice == "2") {
-                break;
-            } else {
-                cout << "Invalid choice. Please try again." << endl;
-            }
-        }
+    clearScreen();
+    cout << "| No. |      title      |      author      |     publisher     | published year | available copies |" << endl;
+    delay(1);
+    cout << "----------------------------------------------------------------------------------------------------" << endl;
+    delay(1);
+    for (long long i = 0; i < beShown.size(); i++) {
+        showSpace(to_string(i + 1), 5);
+        showSpace(beShown[i]->getTitle(), 16);
+        showSpace(beShown[i]->getAuthor(), 16);
+        showSpace(beShown[i]->getPublisher(), 16);
+        showSpace(to_string(beShown[i]->getPublishedYear()), 16);
+        showSpace(to_string(beShown[i]->getAvailable()), 16);
+        type("\n", 1);
+        delay(1);
     }
     
 }
 
-void Library::listAllBooks() {
-    beShown.clear();
-    for (auto& book : books) {
-        beShown.push_back(&book);
+void Library::search() {
+    type("Search by: \n", 1);
+    type("1. Title\n", 1);
+    type("2. Author\n", 1);
+    type("3. Publisher\n", 1);
+    type("4. Published Year\n", 1);
+    int op;
+    string target;
+    cin >> op;
+    if (cin.peek() == '\n') cin.ignore();
+    switch (op) {
+        case 1:
+            type("Please enter the title of the book: \n", 1);
+            getline(cin, target); 
+            searchByTitle(target);
+            lastsearch = bind(&Library::searchByTitle, this, target);
+            break;
+        case 2:
+            type("Please enter the author of the book: \n", 1);
+            getline(cin, target);
+            searchByAuthor(target);
+            lastsearch = bind(&Library::searchByAuthor, this, target);
+            break;
+        case 3:
+            type("Please enter the publisher of the book: \n", 1);
+            getline(cin, target); 
+            searchByPublisher(target);
+            lastsearch = bind(&Library::searchByPublisher, this, target);
+            break;
+        case 4:
+            type("Please enter the published year of the book: \n", 1);
+            getline(cin, target);
+            searchByYear(target);
+            lastsearch = bind(&Library::searchByYear, this, target);
+            break;
+        default:
+            type("Invalid option!\n", 1);
     }
 }
 
+void Library::searchByTitle(string title) {
+    beShown = titleSearch.search("title", title);
+    if (beShown.empty()) {
+        type("No book found." + title + "\n", 1);
+    } else {
+        type("Books with title " + title + ": \n", 1);
+        displayBook();
+    }
+}
 
+void Library::searchByAuthor(string author) {    
+    beShown = authorSearch.search("author", author);
+    if (beShown.empty()) {
+        type("No book found by author: " + author + "\n", 1);
+    } else {
+        type("Books by " + author + ": \n", 1);
+        displayBook();
+    }
+}
 
+void Library::searchByPublisher(string publisher) {
+    beShown = publisherSearch.search("publisher", publisher);
+    if (beShown.empty()) {
+        type("No book found by publisher " + publisher + "\n", 1);
+    } else {
+        type("Books published by " + publisher + ": \n", 1);
+        displayBook();
+    }
+}
 
+void Library::searchByYear(string year) {
+    beShown = yearSearch.search("year", year);
+    if (beShown.empty()) {
+        type("No book found published in year: " + year + "\n", 1);
+    } else {
+        type("Books published in " + year + ": \n", 1);
+        displayBook();
+    }
+}
+
+void Library::listAllBooks() {
+    beShown = books;
+    if (beShown.empty()) {
+        type("No book found.\n", 1);
+    } else {
+        type("All books: \n", 1);
+        displayBook();
+    }
+}
 
 
 
 //admin
-void inputCheck (string* target) {
-    bool valid = 0;
-    while (!valid) {
-        getline(cin, *target);
-        valid = 1;
-        for (auto it : *target) {
-            if (it == '|') {
-                cout << "'|' is not allowed." << endl;
-                valid = 0;
-                break;
-            }
-        }
-    }
-}
-
 void Library::addBook() {
     string title;
     string author;
@@ -226,69 +219,165 @@ void Library::addBook() {
     int published_year;
     int quantity;
     if (cin.peek() == '\n') cin.ignore();
-    cout << "Please enter the title of the book: " << endl; 
+    type("Please enter the title of the book: \n", 1); 
     inputCheck(&title);
-    cout << "Please enter the author of the book: " << endl;
+    type("Please enter the author of the book: \n", 1);
     inputCheck(&author);
-    cout << "Please enter the publisher of the book: " << endl;
+    type("Please enter the publisher of the book: \n", 1);
     inputCheck(&publisher);
-    cout << "Please enter the published year of the book: " << endl;
+    type("Please enter the published year of the book: \n", 1);
     cin >> published_year;
-    cout << "Please enter the quantity of the book's copy: " << endl;
+    type("Please enter the quantity of the book's copy: \n", 1);
     cin >> quantity;
 
-    books.push_back(Book(sizeof(books), title, author, publisher, published_year, quantity, 0, 0));
+    books.push_back(new Book(title, author, publisher, published_year, quantity, 0));
+    titleSearch.insert(books.back(), books.back()->getTitle());
+    authorSearch.insert(books.back(), books.back()->getAuthor());
+    publisherSearch.insert(books.back(), books.back()->getPublisher());
+    yearSearch.insert(books.back(), to_string(books.back()->getPublishedYear()));
+    type("Book added successfully!\n", 1);
     save();
-    cout << "Book added successfully!" << endl;
 }
 
-void Library::removeCopy() {
+void Library::changeQuantity() {
+    type("Please enter the index of the book: \n", 1);
+    int index;
+    cin >> index;
+    if (index < 1 || index > books.size()) {
+        type("Invalid index!\n", 1);
+        return;
+    }
+    index--;
+    type("Current quantity: " + to_string(books[index]->getAvailable()) + "\n", 1);
+    type("Please enter the new quantity: \n", 1);
+    int new_quantity;
+    cin >> new_quantity;
+    if (new_quantity < 0) {
+        type("Quantity cannot be negative!\n", 1);
+        return;
+    }
+    if (new_quantity < books[index]->getAvailable()) {
+        type("New quantity shouldn't less than available copies!\n", 1);
+        return;
+    }
+    
+    books[index]->available = new_quantity - books[index]->lent;
+    save();
+    type("Quantity changed successfully!\n", 1);
+    return;
 
 }
+
 //reader
+void Library::showMyBooks() {
+    if (user.mybooks.empty()) {
+        type("You have no books checked out.\n", 1);
+        return;
+    }
+    int overdue = 0;
+    clearScreen();
+    cout << "| No. |      title      |      author      |     publisher     | published year | due date |" << endl;
+    delay(1);
+    cout << "--------------------------------------------------------------------------------------------" << endl;
+    delay(1);
+    time_t now = time(0);
 
-/*BookCopy* Library::checkOutBook(int No) {
-    BookCopy* copy = nullptr;
+    for (long long i = 0; i < user.mybooks.size(); i++) {
+        tm due_date = user.mybooks[i]->due_date;
+        if (mktime(&due_date) < now) {
+            cout << "\033[31m"; //red words
+            overdue++;
+        }
+        showSpace(to_string(i + 1), 5);
+        showSpace(user.mybooks[i]->parentBook->getTitle(), 16);
+        showSpace(user.mybooks[i]->parentBook->getAuthor(), 16);
+        showSpace(user.mybooks[i]->parentBook->getPublisher(), 16);
+        showSpace(to_string(user.mybooks[i]->parentBook->getPublishedYear()), 16);
+        showSpace(to_string(user.mybooks[i]->due_date.tm_year + 1900) + "/" + to_string(user.mybooks[i]->due_date.tm_mon + 1) + "/" + to_string(user.mybooks[i]->due_date.tm_mday), 16);
+        type("\n", 1);
+        delay(1);
+        cout << "\033[0m"; //reset color
+    }
+    if (overdue > 0) {
+        type("You have " + to_string(overdue) + " overdue book(s).\n", 1);
+        type("Please return them as soon as possible\n", 1);
+    }
+    return;
+    
+}
 
-    if (beShown[No]->available == 0) {
-        cout << "No available copies." << endl;
-        tm availableTime = {};
-        availableTime.tm_year = 2000;
-        availableTime.tm_mon = 1;
-        availableTime.tm_mday = 1;
-        for (auto it : beShown[No]->copies) {
-            if (mktime(&it.due_date) < mktime(&availableTime)) {
-                availableTime = it.due_date;
-                break;
+
+void Library::checkOutBook() {
+    if (user.mybooks.size() >= 10) {
+        type("You have checked out 10 books, please return some first\n", 1);
+        return;
+    }
+    if (user.getPunishment() > 0) {
+        type("You have a punishment of " + to_string(user.getPunishment()) + " days. You cannot check out books.\n", 1);
+        return;
+    }
+    type("Please enter the index of the book: \n", 1);
+    int index;
+    cin >> index;
+    if (index < 1 || index > beShown.size()) {
+        type("Invalid index!\n", 1);
+        return;
+    }
+    index--;
+    if (beShown[index]->getAvailable() <= 0) {
+        type("No available copies for this book now.\n", 1);
+        tm soon = {0};
+        for (auto& it : beShown[index]->copies) {
+            if (mktime(&it.due_date) > mktime(&soon)) {
+                soon = it.due_date;
             }
         }
-        cout << "The earliest available copy is due on: " << availableTime.tm_year + 1900 << "-" << availableTime.tm_mon + 1 << "-" << availableTime.tm_mday << endl;
-        return nullptr;
-    } else if (user.getCheckedOutCount() >= MAX_BORROWED_BOOKS) {
-        cout << "You have reached the maximum number of borrowed books." << endl;
-        return nullptr;
-    } else {
-        cout << "You have checked out the book successfully!" << endl;
-        beShown[No]->available--;
-        beShown[No]->lent++;
-        beShown[No]->popularity++;
-        BookCopy newCopy(beShown[No]->copies.size(), {}, No);
-        time_t now = time(0);
-        tm* ltm = localtime(&now);
-        newCopy.due_date.tm_year = ltm->tm_year + 1900;
-        newCopy.due_date.tm_mon = ltm->tm_mon + 1;
-        newCopy.due_date.tm_mday = ltm->tm_mday + 30;
-        mktime(&newCopy.due_date);
-        beShown[No]->copies.push_back(newCopy);
-        copy = &beShown[No]->copies.back();
+        type("You may lend this book at: " + to_string(soon.tm_year + 1900) + "/" + to_string(soon.tm_mon + 1) + "/" + to_string(soon.tm_mday) + "\n", 1);
+
+        return;
     }
-    return copy;
-}*/
+    
+    time_t now = time(0);
+    tm due_date = *localtime(&now);
+    due_date.tm_mon += 1; 
+    
+    int ID = beShown[index]->copies.size() + 1; 
+    beShown[index]->addCopy(ID, due_date, beShown[index], user.getAccount());
+    user.mybooks.push_back(&beShown[index]->copies.back());
+    
+    beShown[index]->available--;
+    beShown[index]->lent++;
 
-void Library::returnBook() {
+    user.lentbooks++;
+    
+    save();
+    
+    type("Book checked out successfully!\n", 1);
 
+    showMyBooks();
 }
 
+void Library::returnBook() {
+    type("Please enter the index of the book you want to return: \n", 1);
+    int index;
+    cin >> index;
+    if (index < 1 || index > user.mybooks.size()) {
+        type("Invalid index!\n", 1);
+        return;
+    }
+    index--;
+    BookCopy* target = user.mybooks[index];
+    target->parentBook->available++;
+    target->parentBook->lent--;
+    target->parentBook->copies.erase(target->parentBook->copies.begin() + (target->ID - 1)); //remove the copy from the book's copies
+    user.mybooks.erase(user.mybooks.begin() + index);
+    user.lentbooks--;
+    save();
+    type("Book returned successfully!\n", 1);
+    showMyBooks();
+    return;
+
+}
 
 
 

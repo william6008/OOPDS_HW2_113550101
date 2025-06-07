@@ -12,12 +12,12 @@ class BookCopy {
 private:
     int ID;
     tm due_date;
-    int parentBookIndex;
+    Book* parentBook;
+    string reader;
 
 public:
-    BookCopy(int ID, tm due_date, int parentBookIndex);
+    BookCopy(int ID, tm due_date, Book* parentBook, string reader);
     friend class Library;
-    friend class Reader;
 };
 
 #endif 

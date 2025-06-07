@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <ctime>
+#include "BookCopy.h"
 
 using namespace std;
 
@@ -15,8 +16,6 @@ private:
     vector<BookCopy> copies;
     int available;
     int lent;
-    int index;
-    int popularity;
 
 protected:
     string title;
@@ -26,17 +25,17 @@ protected:
     
 
 public:
-    Book(int index
-        , string title
-        , string author
-        , string publisher
-        , int published_year
-        , int available
-        , int lent
-        , int popularity
-    );
+    Book(string title, string author, string publisher, int published_year, int available, int lent);
 
+    string getTitle() const;
+    string getAuthor() const;
+    string getPublisher() const;
+    int getPublishedYear() const;
+    int getAvailable() const;
+    int getLent() const;
+    
 
+    void addCopy(int ID, tm due_date, Book* parentBook, string reader);
     
 
     friend class Library;

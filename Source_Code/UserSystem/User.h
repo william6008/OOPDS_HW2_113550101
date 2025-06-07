@@ -2,24 +2,33 @@
 #define USER_H
 
 #include <string>
+#include <vector>
+#include "../Classes/Book.h"
+#include "../Classes/BookCopy.h"
 using namespace std;
 
 class User {
-protected:
+private:
     bool isAdmin; 
     string account;
     string password;
-
+    vector<BookCopy*> mybooks; 
+    int punishment; 
+    int lentbooks;
 public:
     string getAccount();
     string getPassword();
-    int getCheckedOutCount();
+    int getPunishment();
     bool getIsAdmin();
     
     bool login();
     bool registerUser();
 
-    virtual void interface();
+    void user_save();
+
+    
+
+friend class Library;
 };
 
 #endif
