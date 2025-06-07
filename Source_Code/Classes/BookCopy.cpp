@@ -1,4 +1,3 @@
-
 #include "BookCopy.h"
 
 using namespace std;

@@ -6,6 +6,8 @@
 
 using namespace std;
 
+
+
 string User::getAccount() {
     return this->account;
 }
@@ -110,12 +112,12 @@ bool User::registerUser() {
 void User::adminInterface() {
     cout << "Welcome to the admin Interface" << endl;
     Library library;
-    library.load(); 
     int op = -1;
     while (op != 0) {
         cout << "1. Add Book" << endl;
         cout << "2. Remove Book" << endl;
         cout << "3. List All Books" << endl;
+        cout << "4. Search Books" << endl;
         cout << "0. Exit" << endl;
         cin >> op;
         switch (op) {
@@ -126,7 +128,10 @@ void User::adminInterface() {
                 //removeBook();
                 break;
             case 3:
-                //listAllBooks();
+                library.listAllBooks();
+                break;
+            case 4:
+                library.search();
                 break;
             case 0:
                 cout << "Exiting admin interface." << endl;

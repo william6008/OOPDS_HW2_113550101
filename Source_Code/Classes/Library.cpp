@@ -2,8 +2,17 @@
 #include <fstream>
 #include <string>
 #include "library.h"
+#include "Book.h"
+#include "BookCopy.h"
+#include "../DataStructure/HashTable.h"
+#include "../Helper/Helper.h"
 
 using namespace std;
+
+//constructor
+Library::Library() : titleSearch(1009), authorSearch(1009), publisherSearch(1009), yearSearch(1009) {
+    load();
+}
 
 //system
 void Library::load() {
@@ -21,6 +30,7 @@ void Library::load() {
     int available;
     int lent;
 
+    books.clear();
 
     for (int i = 0; getline(in, title, '|'); i++) {
         getline(in, author, '|');
@@ -32,7 +42,7 @@ void Library::load() {
         in >> lent;
         in.ignore(1, '\n');
         books.push_back(new Book(title, author, publisher, published_year, available, lent));
-        titleSearch.insert(books.back());
+        titleSearch.insert(books.back(), books.back()->getTitle());
         authorSearch.insert(books.back(), books.back()->getAuthor());
         publisherSearch.insert(books.back(), books.back()->getPublisher());
         yearSearch.insert(books.back(), to_string(books.back()->getPublishedYear()));
@@ -78,86 +88,112 @@ void Library::save() {
 
 //both
 
-void showSpace(string str) {
-    int len = str.length();
-    string copy;
 
-    if (len > 14) {
-        copy = str.substr(0, 11) + "...";
-        len = 14;
-    } else {
-        copy = str;
-    }
 
-    for (int i = 0; i < (16 - len) / 2; i++) {
-        cout << " ";
-    }
-
-    cout << copy;
-
-    for (int i = 0; i < (16 - len) / 2 + (len % 2); i++) {
-        cout << " ";
-    }
-}
-
-/*void Library::displayBook() {
-    cout << "" << endl;
-    cout << "--------------------------------------------------------------------------------" << endl;
-    
-    // 顯示每本書的資訊
-    int i = 0;  // 用來顯示書本的編號
-    for (auto it = beShown.begin(); it != beShown.end(); it++, i++) {
-        // 顯示書本編號
-        showSpace(to_string(i));
-        
-        // 顯示書本名稱
-        showSpace((*it)->getTitle());
-
-        // 顯示書本分類
-        showSpace((*it)->getCategory());
-
-        // 顯示到期時間（如果有的話）
-        if ((*it)->getDueTime().tm_year != -1) {
-            string dueDate = to_string((*it)->getDueTime().tm_year + 1900) + "/" + 
-                             to_string((*it)->getDueTime().tm_mon + 1) + "/" + 
-                             to_string((*it)->getDueTime().tm_mday);
-            showSpace(dueDate);
-        } else {
-            showSpace("-");
-        }
-
-        // 顯示是否完成
-        if ((*it)->getCompleted()) {
-            showSpace("Yes");
-        } else {
-            showSpace("No");
-        }
-
+void Library::displayBook() {
+    clearScreen();
+    cout << "| No. |      title      |      author      |     publisher     | published year | available copies |" << endl;
+    cout << "----------------------------------------------------------------------------------------------------" << endl;
+    for (long long i = 0; i < beShown.size(); i++) {
+        showSpace(to_string(i + 1), 5);
+        showSpace(beShown[i]->getTitle(), 16);
+        showSpace(beShown[i]->getAuthor(), 16);
+        showSpace(beShown[i]->getPublisher(), 16);
+        showSpace(to_string(beShown[i]->getPublishedYear()), 16);
+        showSpace(to_string(beShown[i]->getAvailable()), 16);
         cout << endl;
     }
 
-    cout << "--------------------------------------------------------------------------------" << endl;
-}*/
+}
 
+void Library::search() {
+    cout << "Search by: " << endl;
+    cout << "1. Title" << endl;
+    cout << "2. Author" << endl;
+    cout << "3. Publisher" << endl;
+    cout << "4. Published Year" << endl;
+    int op;
+    cin >> op;
+    if (cin.peek() == '\n') cin.ignore();
+    switch (op) {
+        case 1:
+            searchByTitle();
+            break;
+        case 2:
+            searchByAuthor();
+            break;
+        case 3:
+            searchByPublisher();
+            break;
+        case 4:
+            searchByYear();
+            break;
+        default:
+            cout << "Invalid option!" << endl;
+    }
+}
 
+void Library::searchByTitle() {
+    string title;
+    cout << "Please enter the title of the book: " << endl;
+    getline(cin, title); 
+    beShown = titleSearch.search("title", title);
+    if (beShown.empty()) {
+        cout << "No book found." << title << endl;
+    } else {
+        displayBook();
+    }
+}
+
+void Library::searchByAuthor() {
+    string author;
+    cout << "Please enter the author of the book: " << endl;
+    getline(cin, author); 
+    beShown = authorSearch.search("author", author);
+    if (beShown.empty()) {
+        cout << "No book found by author: " << author << endl;
+    } else {
+        displayBook();
+    }
+}
+
+void Library::searchByPublisher() {
+    string publisher;
+    cout << "Please enter the publisher of the book: " << endl;
+    getline(cin, publisher); 
+    beShown = publisherSearch.search("publisher", publisher);
+    if (beShown.empty()) {
+        cout << "No book found by publisher: " << publisher << endl;
+    } else {
+        displayBook();
+    }
+}
+
+void Library::searchByYear() {
+    string year;
+    cout << "Please enter the published year of the book: " << endl;
+    getline(cin, year);
+    beShown = yearSearch.search("year", year);
+    if (beShown.empty()) {
+        cout << "No book found published in year: " << year << endl;
+    } else {
+        displayBook();
+    }
+}
+
+void Library::listAllBooks() {
+    beShown = books;
+    if (beShown.empty()) {
+        cout << "No book found." << endl;
+    } else {
+        displayBook();
+    }
+}
 
 
 
 //admin
-void inputCheck (string* target) {
-    bool valid = 0;
-    while (!valid) {
-        getline(cin, *target);
-        valid = 1;
-        for (auto it : *target) {
-            if (it == '|') {
-                cout << "'|' is not allowed." << endl;
-                valid = 0;
-                break;
-            }
-        }
-    }
-}
+
 
 void Library::addBook() {
     string title;
@@ -178,8 +214,28 @@ void Library::addBook() {
     cin >> quantity;
 
     books.push_back(new Book(title, author, publisher, published_year, quantity, 0));
+    titleSearch.insert(books.back(), books.back()->getTitle());
+    authorSearch.insert(books.back(), books.back()->getAuthor());
+    publisherSearch.insert(books.back(), books.back()->getPublisher());
+    yearSearch.insert(books.back(), to_string(books.back()->getPublishedYear()));
     save();
 }
+
+void Library::removeCopy(int id, int quantity) {
+    if (id < 0 || id >= beShown.size()) {
+        cout << "Invalid book ID!" << endl;
+        return;
+    }
+    if (beShown[id]->getAvailable() < quantity || quantity <= 0) {
+        cout << "Invalid quantity" << endl;
+        return;
+    }
+
+    beShown[id]->available -= quantity;
+    return;
+}
+
+//reader
 
 
 

@@ -6,7 +6,6 @@
 #include <ctime>
 #include "Book.h"
 #include "BookCopy.h"
-#include "../DataStructure/AVL.h"
 #include "../DataStructure/HashTable.h"
 
 using namespace std;
@@ -14,25 +13,28 @@ using namespace std;
 class Library {
 private:
     vector<Book*> books;
-    AVL titleSearch;
+    HashTable titleSearch;
     HashTable authorSearch;
     HashTable publisherSearch;
     HashTable yearSearch;
     vector<Book*> beShown;
 
 public:
+    //constructor
+    Library();
     //system
     void load();
     void save();
 
     //admin
     void addBook();
-    void removeCopy();
+    void removeCopy(int id, int quantity);
     
     //both
     
     void displayBook();
 
+    void search();
     void searchByTitle();
     void searchByAuthor();
     void searchByPublisher();

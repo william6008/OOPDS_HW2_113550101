@@ -19,8 +19,7 @@ public:
     ~HashTable();
 
     void insert(Book* book, string key);
-    Book* search(const string& type, const string& key) const;
-    void remove(const string& key);
+    vector<Book*> search(const string& type, const string& key) const;
 
 
 };

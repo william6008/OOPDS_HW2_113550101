@@ -1,32 +1,26 @@
-# 編譯器與預設選項
+# 編譯器與參數
 CXX = g++
+CXXFLAGS = -std=c++17 -Wall -IClasses -IDataStructure -IUserSystem -IHelper
 
-# 一般與 Debug 模式的 flags
-CXXFLAGS = -std=c++17 -Wall -IClasses -IUserSystem
-DEBUGFLAGS = -g
-
-# 檔案列表
-SRCS = main.cpp \
-       Classes/Book.cpp \
-       Classes/BookCopy.cpp \
-       Classes/Library.cpp \
-       UserSystem/User.cpp
-
+# 專案檔案清單
+SRC_DIRS = Classes DataStructure UserSystem Helper
+SRCS = $(wildcard main.cpp $(foreach dir, $(SRC_DIRS), $(dir)/*.cpp))
 OBJS = $(SRCS:.cpp=.o)
 
-# 預設目標
-TARGET = library_app
+# 最終執行檔
+TARGET = library_app.exe
 
+# 預設目標
 all: $(TARGET)
 
-# Release 模式（無 -g）
+# 連結所有 .o 檔成最終執行檔
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(OBJS) -o $@
 
-# Debug 模式（使用 -g）
-debug: CXXFLAGS += $(DEBUGFLAGS)
-debug: clean $(TARGET)
+# 編譯 .cpp 成 .o
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# 清除所有中間檔
+# 清除編譯產物
 clean:
 	rm -f $(OBJS) $(TARGET)

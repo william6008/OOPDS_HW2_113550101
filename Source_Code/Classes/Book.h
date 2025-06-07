@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <ctime>
+#include "BookCopy.h"
 
 using namespace std;
 
