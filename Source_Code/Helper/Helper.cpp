@@ -22,7 +22,7 @@ string input(const set<string>& expected, const string& error) {
         if (expected.count(input)) {
             return input;
         }
-        type(input + " is not allowed. " + error + "\n", 3);
+        type(input + " is not allowed. " + error + "\n", 1);
     }
 }
 
@@ -35,7 +35,7 @@ tm inputDate() {
         if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) days[1] = 29; 
 
         if (year <= 0 || month < 1 || month > 12 || day < 1 || day > days[month - 1]) {
-            type("Invalid date. Please enter a valid date (yyyy mm dd): \n", 3);
+            type("Invalid date. Please enter a valid date (yyyy mm dd): \n", 1);
             continue;
         }
         break;
@@ -51,7 +51,7 @@ tm inputDate() {
 void showSpace(string str, int width) {
     int len = str.length();
     string copy;
-    type(" ", 3);
+    cout << " ";
     if (len > width - 2) {
         copy = str.substr(0, width - 5) + "...";
         len = width - 2;
@@ -60,15 +60,15 @@ void showSpace(string str, int width) {
     }
 
     for (int i = 0; i < (width - len) / 2; i++) {
-        type(" ", 3);
+        cout << " ";
     }
 
-    type(copy, 3);
+    cout << copy;
 
     for (int i = 0; i < (width - len) / 2 + (len % 2); i++) {
-        type(" ", 3);
+        cout << " ";
     }
-    type(" ", 3);
+    cout << " ";
 }
 
 void inputCheck(string* target) {
@@ -78,7 +78,7 @@ void inputCheck(string* target) {
         valid = 1;
         for (auto it : *target) {
             if (it == '|') {
-                type("'|' is not allowed.\n", 3);
+                type("'|' is not allowed.\n", 1);
                 valid = 0;
                 break;
             }
@@ -87,7 +87,7 @@ void inputCheck(string* target) {
 }
 
 void clearScreen() {
-    type("\033[2J\033[1;1H", 3); 
+    type("\033[2J\033[1;1H", 1); 
 }
 
 void type(const string& str, int delay) {
@@ -96,6 +96,8 @@ void type(const string& str, int delay) {
         cout.flush();
         this_thread::sleep_for(chrono::milliseconds(delay));
     }
-    // 移除原本的 cout << endl;
-    // type 函式已經在外部加上 \n
+}
+
+void delay(int seconds) {
+    this_thread::sleep_for(chrono::seconds(seconds));
 }

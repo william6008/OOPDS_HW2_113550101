@@ -19,4 +19,8 @@ void inputCheck(string* target);
 
 void clearScreen();
 
+void type(const string& str, int delay = 5);
+
+void delay(int seconds);
+
 #endif

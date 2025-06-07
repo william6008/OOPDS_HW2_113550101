@@ -3,6 +3,7 @@
 #include<string>
 #include "../Classes/library.h"
 #include "User.h"
+#include "../Helper/Helper.h"
 
 using namespace std;
 
@@ -28,7 +29,7 @@ bool User::login() {
     string correctPassword;
 
     //user enters account
-    cout << "Please enter your username: " << endl;
+    type("Please enter your username: \n", 1);
     cin >> account;
     
     if (account == "admin") {
@@ -37,7 +38,7 @@ bool User::login() {
         ifstream in;
         in.open("ReaderFile\\" + account + ".txt");
         if (!in) {
-            cout << "User not found." << endl;
+            type("User not found.\n", 1);
             return 0;
         }
     
@@ -48,7 +49,7 @@ bool User::login() {
 
     //user enters password
     string password;
-    cout << "Please enter your password: " << endl;
+    type("Please enter your password: \n", 1);
     cin >> password;
     
     if (password == correctPassword) {
@@ -58,14 +59,14 @@ bool User::login() {
             isAdmin = 1;
             return 1;
         } else {
-            cout << "Login successful!" << endl;
-            cout << "Welcome back, " << account << "!" << endl;
+            type("Login successful!\n", 1);
+            type("Welcome back, " + account + "!\n", 1);
             isAdmin = 0;
             return 1;
         }
     }
     else {
-        cout << "Incorrect password." << endl;
+        type("Incorrect password.\n", 1);
         return 0;
     }
 }
@@ -73,18 +74,18 @@ bool User::login() {
 bool User::registerUser() {
     //user enters account
     string account;
-    cout << "Please set up your username: " << endl;
+    type("Please set up your username: \n", 1);
     cin >> account;
     ifstream in;
     in.open("ReaderFile\\" + account + ".txt");
     if (in || account == "admin") {
-        cout << "Username already exists." << endl;
+        type("Username already exists.\n", 1);
         return 0;
     }
     
     //user enters password
     string password;
-    cout << "Please set up your password: " << endl;
+    type("Please set up your password: \n", 1);
     cin >> password;
     
     //create account
@@ -94,7 +95,7 @@ bool User::registerUser() {
     out.open("ReaderFile\\" + account + ".txt");
     if (!out) // Check if the file opened successfully
     {
-        cout << "Unable to open the file!!!" << endl;
+        type("Unable to open the file!!!\n", 1);
         return 0;
     }
     else  // File opened successfully
@@ -102,7 +103,7 @@ bool User::registerUser() {
         /* code */
     }
     
-    cout << "Account created!" << endl;
+    type("Account created!\n", 1);
     out << password << endl;
     out.close();
     this->isAdmin = 0;
@@ -110,15 +111,15 @@ bool User::registerUser() {
 }
 
 void User::adminInterface() {
-    cout << "Welcome to the admin Interface" << endl;
+    type("Welcome to the admin Interface\n", 1);
     Library library;
     int op = -1;
     while (op != 0) {
-        cout << "1. Add Book" << endl;
-        cout << "2. Remove Book" << endl;
-        cout << "3. List All Books" << endl;
-        cout << "4. Search Books" << endl;
-        cout << "0. Exit" << endl;
+        type("1. Add Book\n", 1);
+        type("2. Remove Book\n", 1);
+        type("3. List All Books\n", 1);
+        type("4. Search Books\n", 1);
+        type("0. Exit\n", 1);
         cin >> op;
         switch (op) {
             case 1:
@@ -134,24 +135,23 @@ void User::adminInterface() {
                 library.search();
                 break;
             case 0:
-                cout << "Exiting admin interface." << endl;
+                type("Exiting admin interface.\n", 1);
                 break;
             default:
-                cout << "Invalid option." << endl;
+                type("Invalid option.\n", 1);
         }
     }
 
 }
 
 void User::readerInterface() {
-    cout << "Welcome back!" << getAccount() << "." << endl;
     int op = -1;
     while (op != 0) {
-        cout << "1. Search Books" << endl;
-        cout << "2. Check Out Book" << endl;
-        cout << "3. Return Book" << endl;
-        cout << "4. List All Books" << endl;
-        cout << "0. Exit" << endl;
+        type("1. Search Books\n", 1);
+        type("2. Check Out Book\n", 1);
+        type("3. Return Book\n", 1);
+        type("4. List All Books\n", 1);
+        type("0. Exit\n", 1);
         cin >> op;
         switch (op) {
             case 1:
@@ -176,10 +176,10 @@ void User::readerInterface() {
                 //listAllBooks();
                 break;
             case 0:
-                cout << "Exiting reader interface." << endl;
+                type("Exiting reader interface.\n", 1);
                 break;
             default:
-                cout << "Invalid option." << endl;
+                type("Invalid option.\n", 1);
         }
     }
 }

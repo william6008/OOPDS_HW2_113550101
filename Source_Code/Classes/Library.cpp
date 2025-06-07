@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <thread>
 #include "library.h"
 #include "Book.h"
 #include "BookCopy.h"
@@ -19,7 +20,7 @@ void Library::load() {
     ifstream in;
     in.open("MyLibrary\\MyLibrary.txt");
     if (!in) {
-        cout << "Unable to open the file!!!" << endl;
+        type("Unable to open the file!!!\n", 1);
         throw "Unable to open the file!!!";
     }
 
@@ -70,7 +71,7 @@ void Library::save() {
     ofstream out;
     out.open("MyLibrary\\MyLibrary.txt", ios::trunc);
     if (!out) {
-        cout << "Unable to open the file!!!" << endl;
+        type("Unable to open the file!!!\n", 1);
         throw "Unable to open the file!!!";
     }
 
@@ -88,11 +89,11 @@ void Library::save() {
 
 //both
 
-
-
 void Library::displayBook() {
     clearScreen();
     cout << "| No. |      title      |      author      |     publisher     | published year | available copies |" << endl;
+    delay(1);
+    delay(1);
     cout << "----------------------------------------------------------------------------------------------------" << endl;
     for (long long i = 0; i < beShown.size(); i++) {
         showSpace(to_string(i + 1), 5);
@@ -101,17 +102,18 @@ void Library::displayBook() {
         showSpace(beShown[i]->getPublisher(), 16);
         showSpace(to_string(beShown[i]->getPublishedYear()), 16);
         showSpace(to_string(beShown[i]->getAvailable()), 16);
-        cout << endl;
+        type("\n", 1);
+        delay(1);
     }
 
 }
 
 void Library::search() {
-    cout << "Search by: " << endl;
-    cout << "1. Title" << endl;
-    cout << "2. Author" << endl;
-    cout << "3. Publisher" << endl;
-    cout << "4. Published Year" << endl;
+    type("Search by: \n", 1);
+    type("1. Title\n", 1);
+    type("2. Author\n", 1);
+    type("3. Publisher\n", 1);
+    type("4. Published Year\n", 1);
     int op;
     cin >> op;
     if (cin.peek() == '\n') cin.ignore();
@@ -129,54 +131,58 @@ void Library::search() {
             searchByYear();
             break;
         default:
-            cout << "Invalid option!" << endl;
+            type("Invalid option!\n", 1);
     }
 }
 
 void Library::searchByTitle() {
     string title;
-    cout << "Please enter the title of the book: " << endl;
+    type("Please enter the title of the book: \n", 1);
     getline(cin, title); 
     beShown = titleSearch.search("title", title);
     if (beShown.empty()) {
-        cout << "No book found." << title << endl;
+        type("No book found." + title + "\n", 1);
     } else {
+        type("Books with title " + title + ": \n", 1);
         displayBook();
     }
 }
 
 void Library::searchByAuthor() {
     string author;
-    cout << "Please enter the author of the book: " << endl;
+    type("Please enter the author of the book: \n", 1);
     getline(cin, author); 
     beShown = authorSearch.search("author", author);
     if (beShown.empty()) {
-        cout << "No book found by author: " << author << endl;
+        type("No book found by author: " + author + "\n", 1);
     } else {
+        type("Books by " + author + ": \n", 1);
         displayBook();
     }
 }
 
 void Library::searchByPublisher() {
     string publisher;
-    cout << "Please enter the publisher of the book: " << endl;
+    type("Please enter the publisher of the book: \n", 1);
     getline(cin, publisher); 
     beShown = publisherSearch.search("publisher", publisher);
     if (beShown.empty()) {
-        cout << "No book found by publisher: " << publisher << endl;
+        type("No book found by publisher " + publisher + "\n", 1);
     } else {
+        type("Books published by " + publisher + ": \n", 1);
         displayBook();
     }
 }
 
 void Library::searchByYear() {
     string year;
-    cout << "Please enter the published year of the book: " << endl;
+    type("Please enter the published year of the book: \n", 1);
     getline(cin, year);
     beShown = yearSearch.search("year", year);
     if (beShown.empty()) {
-        cout << "No book found published in year: " << year << endl;
+        type("No book found published in year: " + year + "\n", 1);
     } else {
+        type("Books published in " + year + ": \n", 1);
         displayBook();
     }
 }
@@ -184,8 +190,9 @@ void Library::searchByYear() {
 void Library::listAllBooks() {
     beShown = books;
     if (beShown.empty()) {
-        cout << "No book found." << endl;
+        type("No book found.\n", 1);
     } else {
+        type("All books: \n", 1);
         displayBook();
     }
 }
@@ -202,15 +209,15 @@ void Library::addBook() {
     int published_year;
     int quantity;
     if (cin.peek() == '\n') cin.ignore();
-    cout << "Please enter the title of the book: " << endl; 
+    type("Please enter the title of the book: \n", 1); 
     inputCheck(&title);
-    cout << "Please enter the author of the book: " << endl;
+    type("Please enter the author of the book: \n", 1);
     inputCheck(&author);
-    cout << "Please enter the publisher of the book: " << endl;
+    type("Please enter the publisher of the book: \n", 1);
     inputCheck(&publisher);
-    cout << "Please enter the published year of the book: " << endl;
+    type("Please enter the published year of the book: \n", 1);
     cin >> published_year;
-    cout << "Please enter the quantity of the book's copy: " << endl;
+    type("Please enter the quantity of the book's copy: \n", 1);
     cin >> quantity;
 
     books.push_back(new Book(title, author, publisher, published_year, quantity, 0));
@@ -223,11 +230,11 @@ void Library::addBook() {
 
 void Library::removeCopy(int id, int quantity) {
     if (id < 0 || id >= beShown.size()) {
-        cout << "Invalid book ID!" << endl;
+        type("Invalid book ID!\n", 1);
         return;
     }
     if (beShown[id]->getAvailable() < quantity || quantity <= 0) {
-        cout << "Invalid quantity" << endl;
+        type("Invalid quantity\n", 1);
         return;
     }
 
