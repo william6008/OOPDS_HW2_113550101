@@ -13,9 +13,10 @@ private:
     int ID;
     tm due_date;
     Book* parentBook;
+    string reader;
 
 public:
-    BookCopy(int ID, tm due_date, Book* parentBook);
+    BookCopy(int ID, tm due_date, Book* parentBook, string reader);
     friend class Library;
 };
 

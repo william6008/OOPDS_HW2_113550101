@@ -35,9 +35,7 @@ public:
     int getLent() const;
     
 
-    void lendBook(int ID, tm due_date);
-    void returnBook(int ID);
-    void addCopy(int ID, tm due_date, Book* parentBook);
+    void addCopy(int ID, tm due_date, Book* parentBook, string reader);
     
 
     friend class Library;

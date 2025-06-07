@@ -99,5 +99,5 @@ void type(const string& str, int delay) {
 }
 
 void delay(int seconds) {
-    this_thread::sleep_for(chrono::seconds(seconds));
+    this_thread::sleep_for(chrono::milliseconds(seconds));
 }

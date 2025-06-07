@@ -1,7 +1,6 @@
 #include<fstream>
 #include<iostream>
 #include<string>
-#include "../Classes/library.h"
 #include "User.h"
 #include "../Helper/Helper.h"
 
@@ -15,6 +14,10 @@ string User::getAccount() {
 
 string User::getPassword() {
     return this->password;
+}
+
+int User::getPunishment() {
+    return this->punishment;
 }
 
 bool User::getIsAdmin() {
@@ -62,6 +65,10 @@ bool User::login() {
             type("Login successful!\n", 1);
             type("Welcome back, " + account + "!\n", 1);
             isAdmin = 0;
+            ifstream in;
+            in.open("ReaderFile\\" + account + ".txt");
+            in.ignore(1000, '\n'); 
+            in >> punishment; 
             return 1;
         }
     }
@@ -93,93 +100,21 @@ bool User::registerUser() {
     this->password = password;
     ofstream out;
     out.open("ReaderFile\\" + account + ".txt");
-    if (!out) // Check if the file opened successfully
-    {
+    if (!out) {
         type("Unable to open the file!!!\n", 1);
         return 0;
     }
-    else  // File opened successfully
-    {
-        /* code */
+    else {
+
     }
     
     type("Account created!\n", 1);
     out << password << endl;
+    out << 0 << endl; 
     out.close();
     this->isAdmin = 0;
     return 1;
 }
 
-void User::adminInterface() {
-    type("Welcome to the admin Interface\n", 1);
-    Library library;
-    int op = -1;
-    while (op != 0) {
-        type("1. Add Book\n", 1);
-        type("2. Remove Book\n", 1);
-        type("3. List All Books\n", 1);
-        type("4. Search Books\n", 1);
-        type("0. Exit\n", 1);
-        cin >> op;
-        switch (op) {
-            case 1:
-                library.addBook();
-                break;
-            case 2:
-                //removeBook();
-                break;
-            case 3:
-                library.listAllBooks();
-                break;
-            case 4:
-                library.search();
-                break;
-            case 0:
-                type("Exiting admin interface.\n", 1);
-                break;
-            default:
-                type("Invalid option.\n", 1);
-        }
-    }
 
-}
 
-void User::readerInterface() {
-    int op = -1;
-    while (op != 0) {
-        type("1. Search Books\n", 1);
-        type("2. Check Out Book\n", 1);
-        type("3. Return Book\n", 1);
-        type("4. List All Books\n", 1);
-        type("0. Exit\n", 1);
-        cin >> op;
-        switch (op) {
-            case 1:
-                //searchByYear();
-                break;
-            case 2:
-                //searchByAuthor();
-                break;
-            case 3:
-                //searchByTitle();
-                break;
-            case 4:
-                //searchByPublisher();
-                break;
-            case 5:
-                //checkOutBook();
-                break;
-            case 6:
-                //returnBook();
-                break;
-            case 7:
-                //listAllBooks();
-                break;
-            case 0:
-                type("Exiting reader interface.\n", 1);
-                break;
-            default:
-                type("Invalid option.\n", 1);
-        }
-    }
-}
