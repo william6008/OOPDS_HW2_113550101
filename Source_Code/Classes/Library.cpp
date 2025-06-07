@@ -31,7 +31,11 @@ void Library::load() {
         in.ignore(1, '|');
         in >> lent;
         in.ignore(1, '\n');
-        books.push_back(Book(title, author, publisher, published_year, available, lent));
+        books.push_back(new Book(title, author, publisher, published_year, available, lent));
+        titleSearch.insert(books.back());
+        authorSearch.insert(books.back(), books.back()->getAuthor());
+        publisherSearch.insert(books.back(), books.back()->getPublisher());
+        yearSearch.insert(books.back(), to_string(books.back()->getPublishedYear()));
         for (int j = 0; j < lent; j++) {
             int ID;
             tm due_date = { 0 };
@@ -43,7 +47,7 @@ void Library::load() {
             in.ignore(1, '|');
             in >> due_date.tm_mday;
             in.ignore(1, '\n');
-            books.back().addCopy(ID, due_date, &books.back());
+            books.back()->addCopy(ID, due_date, books.back());
         }
 
 
@@ -61,9 +65,9 @@ void Library::save() {
     }
 
     for (auto& it : books) {
-        out << it.title << "|" << it.author << "|" << it.publisher << "|" << it.published_year << "|" << it.available << "|" << it.lent;
+        out << it->title << "|" << it->author << "|" << it->publisher << "|" << it->published_year << "|" << it->available << "|" << it->lent;
         out << endl;
-        for (auto& it2 : it.copies) {
+        for (auto& it2 : it->copies) {
             out << it2.ID << "|" << it2.due_date.tm_year << "|" << it2.due_date.tm_mon << "|" << it2.due_date.tm_mday;
             out << endl;
         }
@@ -74,7 +78,7 @@ void Library::save() {
 
 //both
 
-void showSpace(string& str) {
+void showSpace(string str) {
     int len = str.length();
     string copy;
 
@@ -96,7 +100,7 @@ void showSpace(string& str) {
     }
 }
 
-void Library::displayBook() {
+/*void Library::displayBook() {
     cout << "" << endl;
     cout << "--------------------------------------------------------------------------------" << endl;
     
@@ -107,7 +111,7 @@ void Library::displayBook() {
         showSpace(to_string(i));
         
         // 顯示書本名稱
-        showSpace((*it)->getName());
+        showSpace((*it)->getTitle());
 
         // 顯示書本分類
         showSpace((*it)->getCategory());
@@ -133,7 +137,7 @@ void Library::displayBook() {
     }
 
     cout << "--------------------------------------------------------------------------------" << endl;
-}
+}*/
 
 
 
@@ -173,7 +177,7 @@ void Library::addBook() {
     cout << "Please enter the quantity of the book's copy: " << endl;
     cin >> quantity;
 
-    books.push_back(Book(title, author, publisher, published_year, quantity, 0));
+    books.push_back(new Book(title, author, publisher, published_year, quantity, 0));
     save();
 }
 

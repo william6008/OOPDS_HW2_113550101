@@ -139,16 +139,13 @@ void User::adminInterface() {
 }
 
 void User::readerInterface() {
-    cout << "Welcome to the reader interface!" << endl;
+    cout << "Welcome back!" << getAccount() << "." << endl;
     int op = -1;
     while (op != 0) {
-        cout << "1. Search by Year" << endl;
-        cout << "2. Search by Author" << endl;
-        cout << "3. Search by Title" << endl;
-        cout << "4. Search by Publisher" << endl;
-        cout << "5. Check Out Book" << endl;
-        cout << "6. Return Book" << endl;
-        cout << "7. List All Books" << endl;
+        cout << "1. Search Books" << endl;
+        cout << "2. Check Out Book" << endl;
+        cout << "3. Return Book" << endl;
+        cout << "4. List All Books" << endl;
         cout << "0. Exit" << endl;
         cin >> op;
         switch (op) {

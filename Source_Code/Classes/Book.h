@@ -26,6 +26,14 @@ protected:
 public:
     Book(string title, string author, string publisher, int published_year, int available, int lent);
 
+    string getTitle() const;
+    string getAuthor() const;
+    string getPublisher() const;
+    int getPublishedYear() const;
+    int getAvailable() const;
+    int getLent() const;
+    
+
     void lendBook(int ID, tm due_date);
     void returnBook(int ID);
     void addCopy(int ID, tm due_date, Book* parentBook);

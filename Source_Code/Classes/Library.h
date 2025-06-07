@@ -6,12 +6,18 @@
 #include <ctime>
 #include "Book.h"
 #include "BookCopy.h"
+#include "../DataStructure/AVL.h"
+#include "../DataStructure/HashTable.h"
 
 using namespace std;
 
 class Library {
 private:
-    vector<Book> books;
+    vector<Book*> books;
+    AVL titleSearch;
+    HashTable authorSearch;
+    HashTable publisherSearch;
+    HashTable yearSearch;
     vector<Book*> beShown;
 
 public:
