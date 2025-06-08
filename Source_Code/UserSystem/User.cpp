@@ -1,6 +1,7 @@
 #include<fstream>
 #include<iostream>
 #include<string>
+#include <conio.h>
 #include "User.h"
 #include "../Helper/Helper.h"
 
@@ -14,10 +15,6 @@ string User::getAccount() {
 
 string User::getPassword() {
     return this->password;
-}
-
-int User::getPunishment() {
-    return this->punishment;
 }
 
 bool User::getIsAdmin() {
@@ -36,16 +33,17 @@ bool User::login() {
     cin >> account;
     
     if (account == "admin") {
-        correctPassword = "admin"; //admin correct password
-    } else {
+        correctPassword = "admin"; 
         ifstream in;
         in.open("ReaderFile\\" + account + ".txt");
         if (!in) {
             type("User not found.\n", 1);
+            type("Press any key to continue.\n", 1);
+            _getch(); 
             return 0;
         }
     
-        in >> correctPassword; //read user password from the file
+        in >> correctPassword;
         in.close();
     }
     
@@ -67,13 +65,15 @@ bool User::login() {
             isAdmin = 0;
             ifstream in;
             in.open("ReaderFile\\" + account + ".txt");
-            in.ignore(1000, '\n'); 
-            in >> punishment; 
+            in.ignore(1000, '\n');
+            delay(50); 
             return 1;
         }
     }
     else {
         type("Incorrect password.\n", 1);
+        type("Press any key to continue.\n", 1);
+        _getch(); 
         return 0;
     }
 }
@@ -87,6 +87,8 @@ bool User::registerUser() {
     in.open("ReaderFile\\" + account + ".txt");
     if (in || account == "admin") {
         type("Username already exists.\n", 1);
+        type("Press any key to continue.\n", 1);
+        _getch(); 
         return 0;
     }
     
@@ -109,6 +111,7 @@ bool User::registerUser() {
     }
     
     type("Account created!\n", 1);
+    delay(50);
     out << password << endl;
     out << 0 << endl; 
     out.close();

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <thread>
+#include <conio.h>
 #include "library.h"
 #include "Book.h"
 #include "BookCopy.h"
@@ -55,10 +56,7 @@ void Library::load() {
         yearSearch.insert(books.back(), to_string(books.back()->getPublishedYear()));
         for (int j = 0; j < lent; j++) {
             string reader;
-            int ID;
             tm due_date = { 0 };
-            in >> ID;
-            in.ignore(1, '|');
             in >> due_date.tm_year;
             in.ignore(1, '|');
             in >> due_date.tm_mon;
@@ -67,11 +65,8 @@ void Library::load() {
             in.ignore(1, '|');
             in >> reader;
             in.ignore(1, '\n');
-            books.back()->addCopy(ID, due_date, books.back(), reader);
-            if (reader == user.account) user.mybooks.push_back(&books.back()->copies.back());
+            books.back()->copies.push_back(new BookCopy(due_date, books.back(), reader));
         }
-
-
     }
     in.close();
     return;
@@ -86,11 +81,12 @@ void Library::save() {
     }
 
     for (auto& it : books) {
-        out << it->title << "|" << it->author << "|" << it->publisher << "|" << it->published_year << "|" << it->available << "|" << it->lent;
+        out << it->title << "|" << it->author << "|" << it->publisher 
+        << "|" << it->published_year << "|" << it->available << "|" << it->lent;
         out << endl;
         for (auto& it2 : it->copies) {
-            out << it2.ID << "|" << it2.due_date.tm_year << "|" 
-            << it2.due_date.tm_mon << "|" << it2.due_date.tm_mday << "|" << it2.reader;
+            out << it2->due_date.tm_year << "|" 
+            << it2->due_date.tm_mon << "|" << it2->due_date.tm_mday << "|" << it2->reader;
             out << endl;
         }
     }
@@ -101,18 +97,18 @@ void Library::save() {
 //both
 
 void Library::displayBook() {
-    clearScreen();
+    sortByTitle(beShown);
     cout << "| No. |      title      |      author      |     publisher     | published year | available copies |" << endl;
     delay(1);
     cout << "----------------------------------------------------------------------------------------------------" << endl;
     delay(1);
     for (long long i = 0; i < beShown.size(); i++) {
         showSpace(to_string(i + 1), 5);
-        showSpace(beShown[i]->getTitle(), 16);
-        showSpace(beShown[i]->getAuthor(), 16);
-        showSpace(beShown[i]->getPublisher(), 16);
+        showSpace(beShown[i]->getTitle(), 17);
+        showSpace(beShown[i]->getAuthor(), 18);
+        showSpace(beShown[i]->getPublisher(), 19);
         showSpace(to_string(beShown[i]->getPublishedYear()), 16);
-        showSpace(to_string(beShown[i]->getAvailable()), 16);
+        showSpace(to_string(beShown[i]->getAvailable()), 18);
         type("\n", 1);
         delay(1);
     }
@@ -156,11 +152,16 @@ void Library::search() {
             break;
         default:
             type("Invalid option!\n", 1);
+            delay(30);
+            clearScreen();
+            if (lastsearch) lastsearch();
+            return;
     }
 }
 
 void Library::searchByTitle(string title) {
     beShown = titleSearch.search("title", title);
+    clearScreen();
     if (beShown.empty()) {
         type("No book found." + title + "\n", 1);
     } else {
@@ -171,35 +172,45 @@ void Library::searchByTitle(string title) {
 
 void Library::searchByAuthor(string author) {    
     beShown = authorSearch.search("author", author);
+    clearScreen();
     if (beShown.empty()) {
         type("No book found by author: " + author + "\n", 1);
     } else {
         type("Books by " + author + ": \n", 1);
         displayBook();
     }
+    lastsearch = bind(&Library::searchByAuthor, this, author);
+    return;
 }
 
 void Library::searchByPublisher(string publisher) {
     beShown = publisherSearch.search("publisher", publisher);
+    clearScreen();
     if (beShown.empty()) {
         type("No book found by publisher " + publisher + "\n", 1);
     } else {
         type("Books published by " + publisher + ": \n", 1);
         displayBook();
     }
+    lastsearch = bind(&Library::searchByPublisher, this, publisher);
+    return;
 }
 
 void Library::searchByYear(string year) {
     beShown = yearSearch.search("year", year);
+    clearScreen();
     if (beShown.empty()) {
         type("No book found published in year: " + year + "\n", 1);
     } else {
         type("Books published in " + year + ": \n", 1);
         displayBook();
     }
+    lastsearch = bind(&Library::searchByYear, this, year);
+    return;
 }
 
-void Library::listAllBooks() {
+void Library::listAllBooks(string useless) {
+    clearScreen();
     beShown = books;
     if (beShown.empty()) {
         type("No book found.\n", 1);
@@ -207,6 +218,7 @@ void Library::listAllBooks() {
         type("All books: \n", 1);
         displayBook();
     }
+    lastsearch = bind(&Library::listAllBooks, this, useless);
 }
 
 
@@ -236,6 +248,11 @@ void Library::addBook() {
     publisherSearch.insert(books.back(), books.back()->getPublisher());
     yearSearch.insert(books.back(), to_string(books.back()->getPublishedYear()));
     type("Book added successfully!\n", 1);
+    delay(10);
+    clearScreen();
+    if (lastsearch) {
+        lastsearch();
+    }
     save();
 }
 
@@ -245,6 +262,7 @@ void Library::changeQuantity() {
     cin >> index;
     if (index < 1 || index > books.size()) {
         type("Invalid index!\n", 1);
+        lastsearch();
         return;
     }
     index--;
@@ -254,31 +272,36 @@ void Library::changeQuantity() {
     cin >> new_quantity;
     if (new_quantity < 0) {
         type("Quantity cannot be negative!\n", 1);
+        lastsearch();
         return;
     }
-    if (new_quantity < books[index]->getAvailable()) {
-        type("New quantity shouldn't less than available copies!\n", 1);
+    if (new_quantity < books[index]->getLent()) {
+        type("New quantity shouldn't less than lent copies!\n", 1);
+        lastsearch();
         return;
     }
     
     books[index]->available = new_quantity - books[index]->lent;
     save();
     type("Quantity changed successfully!\n", 1);
+    lastsearch();
     return;
 
 }
 
 //reader
 void Library::showMyBooks() {
+    delay(10);
+    clearScreen();
     if (user.mybooks.empty()) {
         type("You have no books checked out.\n", 1);
         return;
     }
+    type("My books:\n", 1);
     int overdue = 0;
-    clearScreen();
-    cout << "| No. |      title      |      author      |     publisher     | published year | due date |" << endl;
+    cout << "| No. |      title      |      author      |     publisher     | published year |    due date    |" << endl;
     delay(1);
-    cout << "--------------------------------------------------------------------------------------------" << endl;
+    cout << "--------------------------------------------------------------------------------------------------" << endl;
     delay(1);
     time_t now = time(0);
 
@@ -289,18 +312,22 @@ void Library::showMyBooks() {
             overdue++;
         }
         showSpace(to_string(i + 1), 5);
-        showSpace(user.mybooks[i]->parentBook->getTitle(), 16);
-        showSpace(user.mybooks[i]->parentBook->getAuthor(), 16);
-        showSpace(user.mybooks[i]->parentBook->getPublisher(), 16);
+        showSpace(user.mybooks[i]->parentBook->getTitle(), 17);
+        showSpace(user.mybooks[i]->parentBook->getAuthor(), 18);
+        showSpace(user.mybooks[i]->parentBook->getPublisher(), 19);
         showSpace(to_string(user.mybooks[i]->parentBook->getPublishedYear()), 16);
-        showSpace(to_string(user.mybooks[i]->due_date.tm_year + 1900) + "/" + to_string(user.mybooks[i]->due_date.tm_mon + 1) + "/" + to_string(user.mybooks[i]->due_date.tm_mday), 16);
+        showSpace(to_string(user.mybooks[i]->due_date.tm_year + 1900) + "/" + 
+                to_string(user.mybooks[i]->due_date.tm_mon + 1) + "/" + 
+                to_string(user.mybooks[i]->due_date.tm_mday), 16);
         type("\n", 1);
         delay(1);
         cout << "\033[0m"; //reset color
     }
     if (overdue > 0) {
+        cout << "\033[31m"; //red words
         type("You have " + to_string(overdue) + " overdue book(s).\n", 1);
         type("Please return them as soon as possible\n", 1);
+        cout << "\033[0m"; //reset color
     }
     return;
     
@@ -310,10 +337,7 @@ void Library::showMyBooks() {
 void Library::checkOutBook() {
     if (user.mybooks.size() >= 10) {
         type("You have checked out 10 books, please return some first\n", 1);
-        return;
-    }
-    if (user.getPunishment() > 0) {
-        type("You have a punishment of " + to_string(user.getPunishment()) + " days. You cannot check out books.\n", 1);
+        lastsearch();
         return;
     }
     type("Please enter the index of the book: \n", 1);
@@ -321,6 +345,7 @@ void Library::checkOutBook() {
     cin >> index;
     if (index < 1 || index > beShown.size()) {
         type("Invalid index!\n", 1);
+        lastsearch();
         return;
     }
     index--;
@@ -328,22 +353,22 @@ void Library::checkOutBook() {
         type("No available copies for this book now.\n", 1);
         tm soon = {0};
         for (auto& it : beShown[index]->copies) {
-            if (mktime(&it.due_date) > mktime(&soon)) {
-                soon = it.due_date;
+            if (mktime(&it->due_date) > mktime(&soon)) {
+                soon = it->due_date;
             }
         }
-        type("You may lend this book at: " + to_string(soon.tm_year + 1900) + "/" + to_string(soon.tm_mon + 1) + "/" + to_string(soon.tm_mday) + "\n", 1);
-
+        type("You may lend this book at: " + to_string(soon.tm_year + 1900) 
+        + "/" + to_string(soon.tm_mon + 1) + "/" + to_string(soon.tm_mday) + "\n", 1);
+        type("Type any key to continue\n", 1);
+        _getch(); 
+        lastsearch();
         return;
     }
-    
     time_t now = time(0);
     tm due_date = *localtime(&now);
-    due_date.tm_mon += 1; 
-    
-    int ID = beShown[index]->copies.size() + 1; 
-    beShown[index]->addCopy(ID, due_date, beShown[index], user.getAccount());
-    user.mybooks.push_back(&beShown[index]->copies.back());
+    due_date.tm_mon += 1;  
+    beShown[index]->copies.push_back(new BookCopy(due_date, beShown[index], user.account));
+    user.mybooks.push_back(beShown[index]->copies.back());
     
     beShown[index]->available--;
     beShown[index]->lent++;
@@ -351,29 +376,42 @@ void Library::checkOutBook() {
     user.lentbooks++;
     
     save();
-    
     type("Book checked out successfully!\n", 1);
-
-    showMyBooks();
+    type("Press any key to continue\n", 1);
+    _getch(); 
+    lastsearch();
 }
 
 void Library::returnBook() {
+    if (user.mybooks.empty()) {
+        type("You have no books checked out.\n", 1);
+        return;
+    }
     type("Please enter the index of the book you want to return: \n", 1);
     int index;
     cin >> index;
     if (index < 1 || index > user.mybooks.size()) {
         type("Invalid index!\n", 1);
+        showMyBooks();
         return;
     }
     index--;
     BookCopy* target = user.mybooks[index];
     target->parentBook->available++;
     target->parentBook->lent--;
-    target->parentBook->copies.erase(target->parentBook->copies.begin() + (target->ID - 1)); //remove the copy from the book's copies
+    type("Book returned successfully!\n", 1);
+    
+    auto& del = target->parentBook->copies;
+    auto it = find(del.begin(), del.end(), target);
+    if (it != del.end()) del.erase(it);
     user.mybooks.erase(user.mybooks.begin() + index);
     user.lentbooks--;
+    target = nullptr;
+    delete target;
     save();
-    type("Book returned successfully!\n", 1);
+    type("Press any key to continue\n", 1);
+    _getch();
+    
     showMyBooks();
     return;
 

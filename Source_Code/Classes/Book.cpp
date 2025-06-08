@@ -40,7 +40,3 @@ int Book::getLent() const {
 
 
 
-void Book::addCopy(int ID, tm due_date, Book* parentBook, string reader) {
-    copies.push_back(BookCopy(ID, due_date, parentBook, reader));
-
-}

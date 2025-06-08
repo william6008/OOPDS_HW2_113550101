@@ -13,11 +13,9 @@ class BookCopy;
 
 class Book {
 private:
-    vector<BookCopy> copies;
+    vector<BookCopy*> copies;
     int available;
     int lent;
-
-protected:
     string title;
     string author;
     string publisher;
@@ -25,7 +23,8 @@ protected:
     
 
 public:
-    Book(string title, string author, string publisher, int published_year, int available, int lent);
+    Book(string title, string author, string publisher
+        , int published_year, int available, int lent);
 
     string getTitle() const;
     string getAuthor() const;
@@ -33,10 +32,6 @@ public:
     int getPublishedYear() const;
     int getAvailable() const;
     int getLent() const;
-    
-
-    void addCopy(int ID, tm due_date, Book* parentBook, string reader);
-    
 
     friend class Library;
 };

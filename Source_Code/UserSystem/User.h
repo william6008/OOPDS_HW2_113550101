@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <ctime>
 #include "../Classes/Book.h"
 #include "../Classes/BookCopy.h"
 using namespace std;
@@ -12,9 +13,9 @@ private:
     bool isAdmin; 
     string account;
     string password;
+    int lentbooks = 0; 
     vector<BookCopy*> mybooks; 
-    int punishment; 
-    int lentbooks;
+
 public:
     string getAccount();
     string getPassword();
@@ -24,7 +25,6 @@ public:
     bool login();
     bool registerUser();
 
-    void user_save();
 
     
 

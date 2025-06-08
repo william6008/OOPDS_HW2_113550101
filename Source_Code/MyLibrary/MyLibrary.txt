@@ -1,4 +1,32 @@
-abc|william|wil|2025|5|0
-abc|william|wil|2025|5|0
-xperia|william|william|2025|5|0
-bcd|william|wil|2024|3|0
+C++ Primer|Stanley B. Lippman|Addison-Wesley|2012|0|2
+125|5|5|example1
+125|5|10|example2
+Effective Modern C++|Scott Meyers|O'Reilly Media|2014|1|0
+Clean Code|Robert C. Martin|Prentice Hall|2008|2|0
+Design Patterns|Erich Gamma|Addison-Wesley|1994|0|2
+125|5|6|example1
+125|5|20|example2
+The Pragmatic Programmer|Andrew Hunt|Addison-Wesley|1999|2|0
+Introduction to Algorithms|Thomas H. Cormen|MIT Press|2009|0|1
+125|5|4|example1
+Structure and Interpretation of Computer Programs|Harold Abelson|MIT Press|1996|2|0
+Code Complete|Steve McConnell|Microsoft Press|2004|0|2
+125|5|2|example1
+125|5|26|example2
+Refactoring|Martin Fowler|Addison-Wesley|1999|2|0
+The Mythical Man-Month|Frederick P. Brooks Jr.|Addison-Wesley|1975|0|1
+125|5|1|example1
+The C Programming Language|Brian W. Kernighan|Prentice Hall|1988|0|1
+125|5|12|example2
+Programming Pearls|Jon Bentley|Addison-Wesley|2000|2|0
+Clean Architecture|Robert C. Martin|Pearson|2017|1|0
+Software Engineering|Ian Sommerville|Pearson|2015|2|0
+Algorithms|Robert Sedgewick|Addison-Wesley|2011|1|0
+Operating Systems|Abraham Silberschatz|Wiley|2018|2|0
+Computer Networks|Andrew S. Tanenbaum|Pearson|2010|0|1
+125|5|5|example1
+Artificial Intelligence: A Modern Approach|Stuart Russell|Pearson|2020|2|0
+Machine Learning|Tom Mitchell|McGraw-Hill|1997|2|0
+Deep Learning|Ian Goodfellow|MIT Press|2016|2|0
+Compilers: Principles, Techniques, and Tools|Aho, Lam, Sethi, Ullman|Pearson|2006|0|1
+125|6|8|example2

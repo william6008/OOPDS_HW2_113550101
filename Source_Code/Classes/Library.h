@@ -43,7 +43,7 @@ public:
     void searchByAuthor(string author);
     void searchByPublisher(string publisher);
     void searchByYear(string year);
-    void listAllBooks();
+    void listAllBooks(string useless = "");
 
     //reader
     void showMyBooks();

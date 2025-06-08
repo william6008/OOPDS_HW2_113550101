@@ -3,6 +3,8 @@
 #include <set>
 #include <ctime>
 #include "Helper.h"
+#include "../Classes/Book.h"
+#include "../Classes/BookCopy.h"
 #include <thread>
 #include <chrono>
 
@@ -26,35 +28,14 @@ string input(const set<string>& expected, const string& error) {
     }
 }
 
-tm inputDate() {
-    tm date = {};
-    int year, month, day;
-
-    while (cin >> year >> month >> day) {
-        int days[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-        if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) days[1] = 29; 
-
-        if (year <= 0 || month < 1 || month > 12 || day < 1 || day > days[month - 1]) {
-            type("Invalid date. Please enter a valid date (yyyy mm dd): \n", 1);
-            continue;
-        }
-        break;
-    }
-
-    date.tm_year = year - 1900;
-    date.tm_mon = month - 1;
-    date.tm_mday = day;
-
-    return date;
-}
 
 void showSpace(string str, int width) {
     int len = str.length();
     string copy;
     cout << " ";
-    if (len > width - 2) {
-        copy = str.substr(0, width - 5) + "...";
-        len = width - 2;
+    if (len > width) {
+        copy = str.substr(0, width - 3) + "...";
+        len = width;
     } else {
         copy = str;
     }
@@ -65,10 +46,9 @@ void showSpace(string str, int width) {
 
     cout << copy;
 
-    for (int i = 0; i < (width - len) / 2 + (len % 2); i++) {
+    for (int i = 0; i < (width - len) / 2 + ((width - len) % 2); i++) {
         cout << " ";
     }
-    cout << " ";
 }
 
 void inputCheck(string* target) {
@@ -100,4 +80,59 @@ void type(const string& str, int delay) {
 
 void delay(int seconds) {
     this_thread::sleep_for(chrono::milliseconds(seconds));
+}
+
+void sortByTitle(vector<Book*>& books) {
+    vector<Book*> left, right;
+    if (books.size() <= 1) return;
+    left = vector<Book*>(books.begin(), books.begin() + books.size() / 2);
+    right = vector<Book*>(books.begin() + books.size() / 2, books.end());
+    sortByTitle(left);
+    sortByTitle(right);
+    books.clear();
+    while (!left.empty() && !right.empty()) {
+        if (left.front()->getTitle() < right.front()->getTitle()) {
+            books.push_back(left.front());
+            left.erase(left.begin());
+        } else {
+            books.push_back(right.front());
+            right.erase(right.begin());
+        }
+    }
+    while (!left.empty()) {
+        books.insert(books.end(), left.begin(), left.end());
+        left.clear();
+    }
+    while (!right.empty()) {
+        books.insert(books.end(), right.begin(), right.end());
+        right.clear();
+    }
+
+}
+
+void sortByTitle (vector<BookCopy*>& copies) {
+    vector<BookCopy*> left, right;
+    if (copies.size() <= 1) return;
+    left = vector<BookCopy*>(copies.begin(), copies.begin() + copies.size() / 2);
+    right = vector<BookCopy*>(copies.begin() + copies.size() / 2, copies.end());
+    sortByTitle(left);
+    sortByTitle(right);
+    copies.clear();
+    while (!left.empty() && !right.empty()) {
+        if (left.front()->getParentBook()->getTitle() < right.front()->getParentBook()->getTitle()) {
+            copies.push_back(left.front());
+            left.erase(left.begin());
+        } else {
+            copies.push_back(right.front());
+            right.erase(right.begin());
+        }
+    }
+    while (!left.empty()) {
+        copies.insert(copies.end(), left.begin(), left.end());
+        left.clear();
+    }
+    while (!right.empty()) {
+        copies.insert(copies.end(), right.begin(), right.end());
+        right.clear();
+    }
 }

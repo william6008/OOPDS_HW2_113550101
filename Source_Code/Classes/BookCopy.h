@@ -10,13 +10,14 @@ class Book;
 
 class BookCopy {
 private:
-    int ID;
     tm due_date;
     Book* parentBook;
     string reader;
 
 public:
-    BookCopy(int ID, tm due_date, Book* parentBook, string reader);
+    BookCopy(tm due_date, Book* parentBook, string reader);
+    Book* getParentBook() const;
+    bool operator== (const BookCopy& other) const;
     friend class Library;
 };
 

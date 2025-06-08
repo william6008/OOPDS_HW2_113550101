@@ -9,6 +9,7 @@
 using namespace std;
 
 void adminInterface(Library& library) {
+    clearScreen();
     type("Welcome to the admin Interface\n", 1);
     int op = -1;
     enum status {DEFAULT, VIEW};
@@ -28,7 +29,7 @@ void adminInterface(Library& library) {
                         current = VIEW;
                         break;
                     case 3:
-                        library.listAllBooks();
+                        library.listAllBooks("");
                         current = VIEW;
                         break;
                     case 0:
@@ -39,7 +40,7 @@ void adminInterface(Library& library) {
                 break;
             case VIEW:
                 type("Please choose an option:\n", 1);
-                type("1. Add a book\n2. Search for a book\n4. List all books\n5. Change the quantity of copies\n0. Exit\n", 1);
+                type("1. Add a book\n2. Search for a book\n3. List all books\n4. Change the quantity of copies\n0. Exit\n", 1);
                 cin >> op;
                 switch (op) {
                     case 1:
@@ -48,10 +49,10 @@ void adminInterface(Library& library) {
                     case 2:
                         library.search();
                         break;
-                    case 4:
-                        library.listAllBooks();
+                    case 3:
+                        library.listAllBooks("");
                         break;
-                    case 5:
+                    case 4:
                         library.changeQuantity();
                         break;
                     case 0:
@@ -141,6 +142,9 @@ int main() {
         
         if (choice == "l") done = user.login();
         else if (choice == "r") done = user.registerUser();   
+        if (done) break;
+        delay(10);
+        clearScreen();
     }
     Library library(user);
     if (user.getIsAdmin()) adminInterface(library);

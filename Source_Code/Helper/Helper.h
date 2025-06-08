@@ -6,6 +6,8 @@
 #include <ctime>
 #include <set>
 #include <thread>
+#include "../Classes/Book.h"
+#include "../Classes/BookCopy.h"
 
 using namespace std;
 
@@ -22,5 +24,7 @@ void clearScreen();
 void type(const string& str, int delay = 5);
 
 void delay(int seconds);
+
+void sortByTitle(vector<Book*>& books);
 
 #endif
